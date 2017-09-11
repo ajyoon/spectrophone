@@ -19,4 +19,4 @@ wave_params = (
 
 dtype = numpy.int16
 
-chunk_size = 1024
+chunk_size = 4096

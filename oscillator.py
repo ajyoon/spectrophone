@@ -7,7 +7,6 @@ class Oscillator:
 
     periods = {}
 
-
     def __init__(self, frequency):
         self.frequency = frequency
         self.last_played_sample = 0
@@ -25,6 +24,9 @@ class Oscillator:
             Oscillator.periods[self.frequency] = self.period_samples
 
     def get_samples(self, num, amplitude):
+        if amplitude <= 0:
+            return numpy.zeros(num)
+
         rolled_array = numpy.roll(self.period_samples,
                                   -1 * self.last_played_sample)
         full_count, remainder = divmod(num, self.period_length)
@@ -34,4 +36,4 @@ class Oscillator:
 
         self.last_played_sample = ((self.last_played_sample + remainder) %
                                    self.period_length)
-        return (return_array * amplitude).astype(config.dtype)
+        return return_array * amplitude

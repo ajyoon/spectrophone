@@ -101,5 +101,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# debugging temp file
-out.wav
+# debugging outputs
+*.wav
+
+# resources (for now)
+resources/

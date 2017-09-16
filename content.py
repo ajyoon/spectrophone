@@ -12,51 +12,29 @@ from agent import Agent
 from frequencies import frequencies
 
 
-# scale_pitches = {
-#     'gf': frequencies[6],
-#     'bf': frequencies[10],
-#     'c': frequencies[0] * 2,
-#     'df': frequencies[1] * 2,
-#     'ef': frequencies[3] * 2,
-#     'f': frequencies[5] * 2
-# }
-
-# main_pitch_weights = [
-#     (scale_pitches['gf'], 10),
-#     (scale_pitches['bf'], 7),
-#     (scale_pitches['df'], 10),
-#     (scale_pitches['f'], 3),
-# ]
-
-# scale_pitch_weights = [
-#     (scale_pitches['gf'], 5),
-#     (scale_pitches['bf'], 5),
-#     (scale_pitches['c'], 7),
-#     (scale_pitches['df'], 3),
-#     (scale_pitches['ef'], 1),
-#     (scale_pitches['f'], 3),
-# ]
-
 scale_pitches = {
-    'd': frequencies[2],
-    'f': frequencies[5],
-    'g': frequencies[7],
-    'a': frequencies[9],
+    'gf': frequencies[6],
     'bf': frequencies[10],
+    'c': frequencies[0] * 2,
+    'df': frequencies[1] * 2,
+    'ef': frequencies[3] * 2,
+    'f': frequencies[5] * 2
 }
 
 main_pitch_weights = [
-    (scale_pitches['d'], 30),
-    (scale_pitches['f'], 7),
-    (scale_pitches['a'], 10),
+    (scale_pitches['gf'], 10),
+    (scale_pitches['bf'], 7),
+    (scale_pitches['df'], 10),
+    (scale_pitches['f'], 3),
 ]
 
 scale_pitch_weights = [
-    (scale_pitches['d'], 5),
+    (scale_pitches['gf'], 5),
+    (scale_pitches['bf'], 5),
+    (scale_pitches['c'], 7),
+    (scale_pitches['df'], 3),
+    (scale_pitches['ef'], 1),
     (scale_pitches['f'], 3),
-    (scale_pitches['g'], 6),
-    (scale_pitches['a'], 5),
-    (scale_pitches['bf'], 6),
 ]
 
 detune_weights = [

@@ -20,3 +20,5 @@ wave_params = (
 dtype = numpy.int16
 
 chunk_size = 4096
+
+score_path = 'resources/test.png'

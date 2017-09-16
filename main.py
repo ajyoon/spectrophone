@@ -3,9 +3,10 @@ import wave
 import config
 import rendering
 
-import content
+import interpreter
 
-samples = rendering.render(content.voices)
+
+samples = rendering.render(interpreter.voices)
 
 with wave.open('out.wav', 'wb') as out:
     out.setparams(config.wave_params)

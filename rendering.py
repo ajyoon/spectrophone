@@ -8,6 +8,7 @@ import numpy
 from tqdm import tqdm
 
 import config
+import terminal
 
 
 def samples_needed(voices):
@@ -25,6 +26,13 @@ def normalize(array, value):
         array[i] = (array[i] / max_value) * value
 
 
+def split_voices(voices, n_groups):
+    """Randomly breaak `voices` into a number of groups"""
+    voices = voices[:]
+    random.shuffle(voices)
+    return numpy.array_split(voices, n_groups)
+
+
 class Work:
     def __init__(self, process, progress, progress_bar):
         self.process = process
@@ -35,16 +43,17 @@ class Work:
 def render(voices):
     num_samples = samples_needed(voices)
     data_array = multiprocessing.Array(ctypes.c_double, num_samples)
-    voice_groups = numpy.array_split(voices, config.processes)
+    voice_groups = split_voices(voices, config.processes)
 
     remaining_work = []
     for group in voice_groups:
         progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
-        progress_bar = tqdm(total=num_samples)
         process = multiprocessing.Process(
             target=render_worker,
             args=(group, data_array, 0, num_samples, progress))
         process.start()
+        progress_bar = tqdm(total=num_samples,
+                            desc=f'rendering pid {process.pid}')
         remaining_work.append(Work(process, progress, progress_bar))
 
     while True:
@@ -57,8 +66,12 @@ def render(voices):
             break
         time.sleep(0.5)
 
+    terminal.clear()
+    print('sample rendering complete...')
     samples = numpy.frombuffer(data_array.get_obj())
+    print('normalizing data...')
     normalize(samples, 32767)
+    print(f'converting to output dtype {config.dtype.__name__}')
     return samples.astype(config.dtype)
 
 

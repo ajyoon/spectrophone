@@ -1,5 +1,4 @@
-import numpy
-
+from tqdm import tqdm
 from blur import rand
 
 import config
@@ -10,7 +9,7 @@ from keyframe import Keyframe
 from frequencies import frequencies
 
 
-num_voices = 100
+num_voices = 1000
 
 scale_pitches = {
     'gf': frequencies[6],
@@ -54,32 +53,38 @@ octave_weights = [
     (8, 0.1),
 ]
 
-score = Score(config.score_path)
 
-# Generate voices
-voices = []
-for i in range(num_voices):
-    base_freq = rand.weighted_choice(scale_pitch_weights)
-    detuned_freq = base_freq + rand.pos_or_neg(
-        rand.weighted_rand(detune_weights))
-    freq = detuned_freq * rand.weighted_choice(octave_weights)
-    voices.append(Voice(Oscillator(freq)))
-    voices.sort(key=lambda v: v.oscillator.frequency)
-
-
-# Generate keyframes
 def value_of(color):
     return sum(color) / 3
 
 
-width = len(score.data[0])
-height = len(score.data)
+def interpret():
+    print('generating frequencies...')
+    voices = []
+    for i in range(num_voices):
+        base_freq = rand.weighted_choice(scale_pitch_weights)
+        detuned_freq = base_freq + rand.pos_or_neg(
+            rand.weighted_rand(detune_weights))
+        freq = detuned_freq * rand.weighted_choice(octave_weights)
+        voices.append(Voice(Oscillator(freq)))
+        voices.sort(key=lambda v: v.oscillator.frequency)
 
-for x in range(width):
-    time = (x / width) * config.length
-    for v_index in range(len(voices)):
-        if rand.prob_bool(0.08):
-            y = abs(int((v_index / len(voices)) * height)
-                    - height + 1)
-            amp = abs((value_of(score.data[y][x]) / 255) - 1)
-            voices[v_index].keyframes.append(Keyframe(time, amp))
+    print('interpreting score...')
+    score = Score(config.score_path)
+
+    width = len(score.data[0])
+    height = len(score.data)
+
+    for x in tqdm(range(width), 'Generating events'):
+        time = (x / width) * config.length
+        for v_index in range(len(voices)):
+            if rand.prob_bool(0.08):
+                y = abs(int((v_index / len(voices)) * height)
+                        - height + 1)
+                amp = abs((value_of(score.data[y][x]) / 255) - 1)
+                voices[v_index].keyframes.append(Keyframe(time, amp))
+
+    for voice in voices:
+        voice.finalize()
+
+    return voices

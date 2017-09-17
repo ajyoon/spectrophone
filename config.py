@@ -28,4 +28,4 @@ silence_threshold = 0.0001
 
 length = 60  # Seconds
 
-score_path = 'resources/blank.png'
+score_path = 'resources/test.png'

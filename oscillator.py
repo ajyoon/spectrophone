@@ -12,7 +12,6 @@ class Oscillator:
         self.last_played_sample = 0
 
         self.period_length = round(config.framerate / self.frequency)
-        factor = self.frequency * ((numpy.pi * 2) / config.framerate)
 
         if (self.frequency, config.framerate) in Oscillator.periods:
             self.period_samples = Oscillator.periods[self.frequency]
@@ -24,8 +23,8 @@ class Oscillator:
             Oscillator.periods[self.frequency] = self.period_samples
 
     def get_samples(self, num, amplitude):
-        if amplitude <= 0:
-            return numpy.zeros(num)
+        if amplitude <= config.silence_threshold:
+            return None
 
         rolled_array = numpy.roll(self.period_samples,
                                   -1 * self.last_played_sample)

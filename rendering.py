@@ -1,11 +1,9 @@
 import ctypes
-import logging
 import multiprocessing
 import time
 import random
 
 import numpy
-import progressbar
 
 from tqdm import tqdm
 
@@ -27,24 +25,6 @@ def normalize(array, value):
         array[i] = (array[i] / max_value) * value
 
 
-def render(voices):
-    progressbar.streams.wrap_stderr()
-    logging.basicConfig()
-
-    bar = progressbar.ProgressBar()
-
-    chunks = []
-    for pos in bar(range(0, samples_needed(voices), config.chunk_size)):
-        chunk = numpy.zeros(config.chunk_size)
-        for voice in voices:
-            chunk = chunk + voice.get_samples_at(pos, config.chunk_size)
-        chunks.append(chunk)
-
-    samples = numpy.concatenate(chunks)
-    normalize(samples, 32767)
-    return samples.astype(config.dtype)
-
-
 class Work:
     def __init__(self, process, progress, progress_bar):
         self.process = process
@@ -52,7 +32,7 @@ class Work:
         self.progress_bar = progress_bar
 
 
-def render_master(voices):
+def render(voices):
     num_samples = samples_needed(voices)
     data_array = multiprocessing.Array(ctypes.c_double, num_samples)
     voice_groups = numpy.array_split(voices, config.processes)
@@ -91,7 +71,9 @@ def render_worker(voices, data_array, start, end, progress):
     for pos in range(start, end + config.chunk_size, config.chunk_size):
         chunk = numpy.zeros(config.chunk_size)
         for voice in voices:
-            chunk = chunk + voice.get_samples_at(pos, config.chunk_size)
+            voice_samples = voice.get_samples_at(pos, config.chunk_size)
+            if voice_samples is not None:
+                chunk = chunk + voice_samples
         chunks.append(chunk)
         # No lock needed since we're the only process writing to this
         progress.value = pos

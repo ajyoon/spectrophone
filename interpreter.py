@@ -10,7 +10,7 @@ from keyframe import Keyframe
 from frequencies import frequencies
 
 
-num_voices = 500
+num_voices = 100
 
 scale_pitches = {
     'gf': frequencies[6],
@@ -81,5 +81,5 @@ for x in range(width):
         if rand.prob_bool(0.08):
             y = abs(int((v_index / len(voices)) * height)
                     - height + 1)
-            amp = abs((value_of(score.data[y][x]) / 256) - 1)
+            amp = abs((value_of(score.data[y][x]) / 255) - 1)
             voices[v_index].keyframes.append(Keyframe(time, amp))

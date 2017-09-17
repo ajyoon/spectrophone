@@ -24,6 +24,8 @@ chunk_size = 4096
 worker_data_size = 128_000_000 // 8  # 128Mb worth of 8-byte doubles
 processes = 12
 
-length = 60 * 3  # Seconds
+silence_threshold = 0.0001
 
-score_path = 'resources/test2.jpg'
+length = 60  # Seconds
+
+score_path = 'resources/blank.png'

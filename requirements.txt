@@ -1,5 +1,4 @@
 numpy
 blur
-progressbar2
 Pillow
 tqdm

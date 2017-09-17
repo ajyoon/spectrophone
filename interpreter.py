@@ -55,7 +55,18 @@ octave_weights = [
 
 
 def color_value(color):
-    return sum(color) / 3
+    """Get the 0-255 grayscale value of an rgb tuple.
+
+    As a bit of optimization, we explicitly sum the values since we know
+    the tuples are well-formed.
+
+        $ python3 -m timeit 't=(1,2,3);sum(t)'
+        1000000 loops, best of 3: 0.243 usec per loop
+        $ python3 -m timeit 't=(1,2,3);t[0]+t[1]+t[2]'
+        10000000 loops, best of 3: 0.154 usec per loop
+
+    """
+    return (color[0] + color[1] + color[2]) // 3
 
 
 def interpret():

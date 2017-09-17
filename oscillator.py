@@ -26,8 +26,10 @@ class Oscillator:
         if amplitude <= config.silence_threshold:
             return None
 
-        rolled_array = numpy.roll(self.period_samples,
-                                  -1 * self.last_played_sample)
+        rolled_array = numpy.concatenate([
+            self.period_samples[self.last_played_sample:],
+            self.period_samples[:self.last_played_sample]
+        ])
         full_count, remainder = divmod(num, self.period_length)
         final_subarray = rolled_array[:remainder]
         return_array = numpy.concatenate((numpy.tile(rolled_array, full_count),

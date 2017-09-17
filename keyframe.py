@@ -2,6 +2,11 @@ import config
 
 
 class Keyframe:
+    """A voice's amplitude keyframe.
+
+    `Keyframe`s must be considered immutable.
+    After initialization, they must not be modified.
+    """
 
     def __init__(self, time, amplitude):
         """
@@ -11,8 +16,4 @@ class Keyframe:
         """
         self.time = time
         self.amplitude = amplitude
-
-    @property
-    def sample_pos(self):
-        """int: The actual sample this occurs in."""
-        return int(config.framerate * self.time)
+        self.sample_pos = int(config.framerate * self.time)

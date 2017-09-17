@@ -113,3 +113,29 @@ def render_worker(voices, data_array, start, end, progress):
             last_write_pos = pos
 
     write_samples(chunks, data_array, last_write_pos)
+
+
+def render_with_single_process(voices):
+    """Single-process version of `render`
+
+    Used for profiling purposes.
+    """
+    num_samples = samples_needed(voices)
+    data_array = multiprocessing.Array(ctypes.c_double, num_samples)
+    voice_groups = split_voices(voices, config.processes)
+
+    for group in tqdm(voice_groups):
+        progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
+        render_worker(group, data_array, 0, num_samples, progress)
+
+    render_start_time = time.time()
+
+    time_elapsed = round(time.time() - render_start_time, 1)
+    print(f'sample rendering completed in {time_elapsed} seconds...')
+    samples = numpy.frombuffer(data_array.get_obj())
+
+    print('normalizing data...')
+    normalize(samples, 32767)
+
+    print(f'converting to output dtype {config.dtype.__name__}')
+    return samples.astype(config.dtype)

@@ -7,7 +7,6 @@ class Voice:
         self.oscillator = oscillator
         self.keyframes = []
         self.last_frame_i = 0
-        self._last_keyframe_i = 0
 
     def finalize(self):
         """Finalize the voice's keyframes.

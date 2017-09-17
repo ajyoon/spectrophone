@@ -9,7 +9,7 @@ from keyframe import Keyframe
 from frequencies import frequencies
 
 
-num_voices = 1000
+num_voices = 5000
 
 scale_pitches = {
     'gf': frequencies[6],
@@ -54,14 +54,13 @@ octave_weights = [
 ]
 
 
-def value_of(color):
+def color_value(color):
     return sum(color) / 3
 
 
 def interpret():
-    print('generating frequencies...')
     voices = []
-    for i in range(num_voices):
+    for i in tqdm(range(num_voices), 'generating oscillators'):
         base_freq = rand.weighted_choice(scale_pitch_weights)
         detuned_freq = base_freq + rand.pos_or_neg(
             rand.weighted_rand(detune_weights))
@@ -75,13 +74,13 @@ def interpret():
     width = len(score.data[0])
     height = len(score.data)
 
-    for x in tqdm(range(width), 'Generating events'):
+    for x in tqdm(range(width), 'generating events'):
         time = (x / width) * config.length
         for v_index in range(len(voices)):
             if rand.prob_bool(0.08):
                 y = abs(int((v_index / len(voices)) * height)
                         - height + 1)
-                amp = abs((value_of(score.data[y][x]) / 255) - 1)
+                amp = abs((color_value(score.data[y][x]) / 255) - 1)
                 voices[v_index].keyframes.append(Keyframe(time, amp))
 
     for voice in voices:

@@ -9,12 +9,13 @@ import interpreter
 import terminal
 
 
+out_path = 'out.wav'
+
 terminal.clear()
 print('drone machine armed...')
 
-samples = rendering.render(interpreter.interpret())
-
-out_path = 'out.wav'
+voices = interpreter.interpret()
+samples = rendering.render(voices)
 
 with wave.open(out_path, 'wb') as out:
     print(f'writing audio data to {out_path}')

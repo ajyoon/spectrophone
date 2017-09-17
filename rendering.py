@@ -56,6 +56,8 @@ def render(voices):
                             desc=f'rendering pid {process.pid}')
         remaining_work.append(Work(process, progress, progress_bar))
 
+    render_start_time = time.time()
+
     while True:
         for work in remaining_work:
             work.progress_bar.update(work.progress.value - work.progress_bar.n)
@@ -67,12 +69,26 @@ def render(voices):
         time.sleep(0.5)
 
     terminal.clear()
-    print('sample rendering complete...')
+
+    time_elapsed = round(time.time() - render_start_time, 1)
+    print(f'sample rendering completed in {time_elapsed} seconds...')
     samples = numpy.frombuffer(data_array.get_obj())
+
     print('normalizing data...')
     normalize(samples, 32767)
+
     print(f'converting to output dtype {config.dtype.__name__}')
     return samples.astype(config.dtype)
+
+
+def write_samples(chunks, data_array, offset):
+    samples = numpy.concatenate(chunks)
+    samples.resize((len(data_array),))
+    with data_array.get_lock():
+        np_array = numpy.frombuffer(data_array.get_obj())[offset:]
+        if len(samples) > len(np_array):
+            samples.resize(len(np_array))
+        np_array += samples
 
 
 def render_worker(voices, data_array, start, end, progress):
@@ -97,13 +113,3 @@ def render_worker(voices, data_array, start, end, progress):
             last_write_pos = pos
 
     write_samples(chunks, data_array, last_write_pos)
-
-
-def write_samples(chunks, data_array, offset):
-    samples = numpy.concatenate(chunks)
-    samples.resize((len(data_array),))
-    with data_array.get_lock():
-        np_array = numpy.frombuffer(data_array.get_obj())[offset:]
-        if len(samples) > len(np_array):
-            samples.resize(len(np_array))
-        np_array += samples

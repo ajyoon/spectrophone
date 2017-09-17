@@ -21,4 +21,9 @@ dtype = numpy.int16
 
 chunk_size = 4096
 
-score_path = 'resources/test.png'
+worker_data_size = 128_000_000 // 8  # 128Mb worth of 8-byte doubles
+processes = 12
+
+length = 60 * 3  # Seconds
+
+score_path = 'resources/test2.jpg'

@@ -118,7 +118,7 @@ for i in range(70):
     graph = Graph(main_nodes)
     agents.append(Agent(Voice(Oscillator(freq)), graph))
 
-length = 60 * 12  # Seconds
+length = 60 * 1  # Seconds
 
 for agent in agents:
     event_times = [random.uniform(0, length) for i in range(length // 3)]

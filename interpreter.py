@@ -10,7 +10,7 @@ from keyframe import Keyframe
 from frequencies import frequencies
 
 
-num_voices = 300
+num_voices = 500
 
 scale_pitches = {
     'gf': frequencies[6],
@@ -55,7 +55,6 @@ octave_weights = [
 ]
 
 score = Score(config.score_path)
-length = 60 * 10  # Seconds
 
 # Generate voices
 voices = []
@@ -77,7 +76,7 @@ width = len(score.data[0])
 height = len(score.data)
 
 for x in range(width):
-    time = (x / width) * length
+    time = (x / width) * config.length
     for v_index in range(len(voices)):
         if rand.prob_bool(0.08):
             y = abs(int((v_index / len(voices)) * height)

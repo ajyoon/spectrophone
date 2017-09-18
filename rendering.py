@@ -58,6 +58,11 @@ def render(voices):
 
     render_start_time = time.time()
 
+    # `voices` and `voice_groups` are potentially large, and we don't need
+    # them anymore, so let the GC know we're done with them.
+    del voices
+    del voice_groups
+
     while True:
         for work in remaining_work:
             work.progress_bar.update(work.progress.value - work.progress_bar.n)

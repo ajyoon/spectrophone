@@ -7,15 +7,12 @@ from tqdm import tqdm
 class Score:
 
     __slots__ = (
-        '_image',
-        'data',
         'amplitude_map'
     )
 
     def __init__(self, image_path):
-        self._image = Image.open(image_path)
-        self.data = numpy.asarray(self._image, dtype=numpy.uint16)
-        self.amplitude_map = Score.create_amplitude_map(self._image)
+        image = Image.open(image_path)
+        self.amplitude_map = Score.create_amplitude_map(image)
 
     @staticmethod
     def create_amplitude_map(image):

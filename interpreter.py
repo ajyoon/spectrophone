@@ -9,7 +9,7 @@ from keyframe import Keyframe
 from frequencies import frequencies
 
 
-num_voices = 30000
+num_voices = 5000
 
 scale_pitches = {
     'gf': frequencies[6],
@@ -67,9 +67,8 @@ def interpret():
     print('interpreting score...')
     score = Score(config.score_path)
 
-    width = len(score.data[0])
-    height = len(score.data)
-
+    width = len(score.amplitude_map[0])
+    height = len(score.amplitude_map)
 
     for x in tqdm(range(width), 'generating events'):
         time = (x / width) * config.length

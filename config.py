@@ -28,6 +28,6 @@ processes = multiprocessing.cpu_count()
 
 silence_threshold = 0.0001
 
-length = 15  # Seconds
+length = 60 * 2  # Seconds
 
-score_path = 'resources/test.png'
+score_path = 'resources/line.png'

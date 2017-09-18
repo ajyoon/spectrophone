@@ -8,6 +8,12 @@ class Keyframe:
     After initialization, they must not be modified.
     """
 
+    __slots__ = (
+        'time',
+        'amplitude',
+        'sample_pos'
+    )
+
     def __init__(self, time, amplitude):
         """
         Args:

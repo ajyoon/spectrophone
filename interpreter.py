@@ -9,7 +9,7 @@ from keyframe import Keyframe
 from frequencies import frequencies
 
 
-num_voices = 5000
+num_voices = 30000
 
 scale_pitches = {
     'gf': frequencies[6],
@@ -53,22 +53,6 @@ octave_weights = [
     (8, 0.1),
 ]
 
-
-def color_value(color):
-    """Get the 0-255 grayscale value of an rgb tuple.
-
-    As a bit of optimization, we explicitly sum the values since we know
-    the tuples are well-formed.
-
-        $ python3 -m timeit 't=(1,2,3);sum(t)'
-        1000000 loops, best of 3: 0.243 usec per loop
-        $ python3 -m timeit 't=(1,2,3);t[0]+t[1]+t[2]'
-        10000000 loops, best of 3: 0.154 usec per loop
-
-    """
-    return (color[0] + color[1] + color[2]) // 3
-
-
 def interpret():
     voices = []
     for i in tqdm(range(num_voices), 'generating oscillators'):
@@ -77,7 +61,8 @@ def interpret():
             rand.weighted_rand(detune_weights))
         freq = detuned_freq * rand.weighted_choice(octave_weights)
         voices.append(Voice(Oscillator(freq)))
-        voices.sort(key=lambda v: v.oscillator.frequency)
+
+    voices.sort(key=lambda v: v.oscillator.frequency)
 
     print('interpreting score...')
     score = Score(config.score_path)
@@ -85,16 +70,16 @@ def interpret():
     width = len(score.data[0])
     height = len(score.data)
 
+
     for x in tqdm(range(width), 'generating events'):
         time = (x / width) * config.length
         for v_index in range(len(voices)):
             if rand.prob_bool(0.08):
-                y = abs(int((v_index / len(voices)) * height)
-                        - height + 1)
-                amp = abs((color_value(score.data[y][x]) / 255) - 1)
+                y = abs(int((v_index / len(voices)) * height) - height + 1)
+                amp = score.amplitude_map[y][x]
                 voices[v_index].keyframes.append(Keyframe(time, amp))
 
     for voice in voices:
-        voice.finalize()
+        voice.finalize(False)
 
     return voices

@@ -3,12 +3,18 @@ import numpy
 
 class Voice:
 
+    __slots__ = (
+        'oscillator',
+        'keyframes',
+        'last_frame_i'
+    )
+
     def __init__(self, oscillator):
         self.oscillator = oscillator
         self.keyframes = []
         self.last_frame_i = 0
 
-    def finalize(self):
+    def finalize(self, keyframes_need_sort=True):
         """Finalize the voice's keyframes.
 
         Must be called before `get_samples_at` may be safely called.
@@ -16,7 +22,8 @@ class Voice:
         if not self.keyframes:
             self.get_samples_at = lambda _: None
         else:
-            self.keyframes.sort(key=lambda k: k.sample_pos)
+            if keyframes_need_sort:
+                self.keyframes.sort(key=lambda k: k.sample_pos)
 
     def get_samples_at(self, sample_pos, chunk_size):
         """Get a chunk of `chunk_size` from the voice at `sample_pos`.

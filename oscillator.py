@@ -7,6 +7,13 @@ class Oscillator:
 
     periods = {}
 
+    __slots__ = (
+        'frequency',
+        'last_played_sample',
+        'period_length',
+        'period_samples'
+    )
+
     def __init__(self, frequency):
         self.frequency = frequency
         self.last_played_sample = 0

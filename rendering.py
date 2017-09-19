@@ -2,6 +2,7 @@ import ctypes
 import multiprocessing
 import time
 import random
+import gc
 
 import numpy
 
@@ -62,6 +63,7 @@ def render(voices):
     # them anymore, so let the GC know we're done with them.
     del voices
     del voice_groups
+    gc.collect()
 
     while True:
         for work in remaining_work:
@@ -107,15 +109,18 @@ def render_worker(voices, data_array, start, end, progress):
         for voice in voices:
             voice_samples = voice.get_samples_at(pos, config.chunk_size)
             if voice_samples is not None:
-                chunk = chunk + voice_samples
+                chunk += voice_samples
         chunks.append(chunk)
         # No lock needed since we're the only process writing to this
         progress.value = pos
 
+        # Try to keep memory under control by periodically dumping progress
+        # to shared memory and invoking the gc.
         if len(chunks) > max_chunks:
             write_samples(chunks, data_array, last_write_pos)
-            chunks = []
             last_write_pos = pos
+            chunks = []
+            gc.collect()
 
     write_samples(chunks, data_array, last_write_pos)
 

@@ -8,7 +8,6 @@ import rendering
 import interpreter
 import terminal
 
-
 out_path = 'out.wav'
 
 terminal.clear()

@@ -25,9 +25,10 @@ chunk_size = 4096
 
 worker_data_size = 128_000_000 // 8  # 128Mb worth of 8-byte doubles
 processes = multiprocessing.cpu_count()
+processes = 1
 
 silence_threshold = 0.0001
 
-length = 60 * 8  # Seconds
+length = 60  # Seconds
 
 score_path = 'resources/score.png'

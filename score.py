@@ -1,6 +1,7 @@
-from PIL import Image, ImageOps
+import gc
 
 import numpy
+from PIL import Image, ImageOps
 from tqdm import tqdm
 
 
@@ -13,6 +14,8 @@ class Score:
     def __init__(self, image_path):
         image = Image.open(image_path)
         self.amplitude_map = Score.create_amplitude_map(image)
+        gc.collect()  # Memory tends to balloon in this init,
+                      # so try to get it back under control
 
     @staticmethod
     def create_amplitude_map(image):

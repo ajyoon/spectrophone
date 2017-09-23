@@ -20,12 +20,9 @@ class Voice:
 
         Must be called before `get_samples_at` may be safely called.
         """
-        if not self.keyframes:
-            self.get_samples_at = lambda _: None
-        else:
-            if keyframes_need_sort:
-                self.keyframes.sort(key=lambda k: k[0])
-            self.keyframes = numpy.array(self.keyframes, dtype='uint32, f2')
+        if keyframes_need_sort:
+            self.keyframes.sort(key=lambda k: k[0])
+        self.keyframes = numpy.array(self.keyframes, dtype='uint32, f2')
 
     def get_samples_at(self, sample_pos, chunk_size):
         """Get a chunk of `chunk_size` from the voice at `sample_pos`.

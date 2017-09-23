@@ -30,7 +30,7 @@ silence_threshold = 0.0001
 
 length = 60  # Seconds
 
-num_voices = 2000
+num_voices = 100000
 
 
-score_path = 'resources/test.png'
+score_path = 'resources/long.png'

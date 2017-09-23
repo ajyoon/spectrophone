@@ -1,5 +1,12 @@
+import multiprocessing
+import ctypes
+import gc
+import time
+import itertools
+
 from tqdm import tqdm
 from blur import rand
+import numpy
 
 import config
 from voice import Voice
@@ -51,6 +58,7 @@ octave_weights = [
 ]
 
 
+
 def interpret():
     voices = []
     for i in tqdm(range(config.num_voices), 'generating oscillators'):
@@ -65,17 +73,77 @@ def interpret():
     print('interpreting score...')
     score = Score(config.score_path)
 
-    width = len(score.amplitude_map[0])
-    height = len(score.amplitude_map)
+    n_groups = config.processes
+    remaining_work = []
+    for voice_group, amp_map_slice in zip(numpy.array_split(
+                                              voices, n_groups),
+                                          numpy.array_split(
+                                              score.amplitude_map, n_groups)):
+        progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
+        result_queue = multiprocessing.Queue(maxsize=1)
+        process = multiprocessing.Process(
+            target=interpret_worker,
+            args=(amp_map_slice, voice_group, progress, result_queue)
+        )
+        process.start()
+        remaining_work.append(
+            InterpretWork(process, result_queue, progress, len(voice_group)))
 
-    for v in tqdm(range(len(voices)), 'generating events'):
+    del voices
+    del score
+    gc.collect()
+
+    interpreted_voices = []
+
+    while True:
+        for work in remaining_work:
+            work.progress_bar.update(work.progress.value - work.progress_bar.n)
+            if not work.result_queue.empty():
+                interpreted_voices.extend(work.result_queue.get())
+                work.progress_bar.close()
+        remaining_work = [w for w in remaining_work if w.process.is_alive()]
+        if not remaining_work:
+            break
+        time.sleep(0.5)
+
+    return interpreted_voices
+
+
+class InterpretWork:
+    def __init__(self, process, result_queue, progress, total):
+        self.process = process
+        self.progress = progress
+        self.progress_bar = tqdm(total=total,
+                                 desc=f'interpreting pid {process.pid}')
+        self.result_queue = result_queue
+
+
+def interpret_worker(amplitude_map, voices, progress, result_queue):
+    width = len(amplitude_map[0])
+    height = len(amplitude_map)
+
+    # Cache event decisions - use period length that unevenly divides score
+    # width so different voices are not aligned
+    prob = max(height / len(voices) * 0.5, 0.0001)
+    event_prob = prob_bool_cycle(prob, width // 7)
+
+    sample_positions = [(x / width) * config.length * config.sample_rate
+                        for x in range(width)]
+    y_voice_map = [abs(int((v / len(voices)) * height) - height + 1)
+                   for v in range(len(voices))]
+
+    for v in range(len(voices)):
         voice = voices[v]
-        y = abs(int((v / len(voices)) * height) - height + 1)
         for x in range(width):
-            if rand.prob_bool(0.08):
-                sample_pos = (x / width) * config.length * config.sample_rate
-                amp = score.amplitude_map[y][x]
-                voice.keyframes.append((sample_pos, amp))
+            if next(event_prob):
+                voice.keyframes.append((sample_positions[x],
+                                        amplitude_map[y_voice_map[v]][x]))
         voice.finalize(False)
+        progress.value = v
 
-    return voices
+    result_queue.put([v for v in voices if len(v.keyframes)])
+
+
+def prob_bool_cycle(prob, length):
+    unrolled = [rand.prob_bool(prob) for i in range(length)]
+    return itertools.cycle(unrolled)

@@ -20,7 +20,7 @@ with wave.open(out_path, 'wb') as out:
     print(f'writing audio data to {out_path}')
     out.setparams(config.wave_params)
     write_chunks = numpy.array_split(samples,
-                                     len(samples) // config.framerate)
+                                     len(samples) // config.sample_rate)
     for write_chunk in tqdm(write_chunks, f'writing to {out_path}'):
         out.writeframes(write_chunk)
 

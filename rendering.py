@@ -13,18 +13,13 @@ import terminal
 
 
 def samples_needed(voices):
-    max_sample = 0
-    for voice in voices:
-        for keyframe in voice.keyframes:
-            if max_sample < keyframe.sample_pos:
-                max_sample = keyframe.sample_pos
-    return max_sample
+    return int(max(v.keyframes[-1][0] for v in voices))
 
 
 def normalize(array, value):
     max_value = max(array.max(), abs(array.min()))
-    for i in range(len(array)):
-        array[i] = (array[i] / max_value) * value
+    factor = value / max_value
+    array *= factor
 
 
 def split_voices(voices, n_groups):

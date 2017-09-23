@@ -5,7 +5,7 @@ import numpy
 
 nchannels = 1
 sampwidth = 2
-framerate = 44100
+sample_rate = 44100
 nframes = 0
 comptype = 'NONE'
 compname = 'NONE'
@@ -13,7 +13,7 @@ compname = 'NONE'
 wave_params = (
     nchannels,
     sampwidth,
-    framerate,
+    sample_rate,
     nframes,
     comptype,
     compname
@@ -25,10 +25,12 @@ chunk_size = 4096
 
 worker_data_size = 128_000_000 // 8  # 128Mb worth of 8-byte doubles
 processes = multiprocessing.cpu_count()
-processes = 1
 
 silence_threshold = 0.0001
 
 length = 60  # Seconds
 
-score_path = 'resources/score.png'
+num_voices = 2000
+
+
+score_path = 'resources/test.png'

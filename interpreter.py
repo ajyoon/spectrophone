@@ -1,4 +1,3 @@
-
 from tqdm import tqdm
 from blur import rand
 
@@ -6,11 +5,8 @@ import config
 from voice import Voice
 from oscillator import Oscillator
 from score import Score
-from keyframe import Keyframe
 from frequencies import frequencies
 
-
-num_voices = 5000
 
 scale_pitches = {
     'gf': frequencies[6],
@@ -54,9 +50,10 @@ octave_weights = [
     (8, 0.1),
 ]
 
+
 def interpret():
     voices = []
-    for i in tqdm(range(num_voices), 'generating oscillators'):
+    for i in tqdm(range(config.num_voices), 'generating oscillators'):
         base_freq = rand.weighted_choice(scale_pitch_weights)
         detuned_freq = base_freq + rand.pos_or_neg(
             rand.weighted_rand(detune_weights))
@@ -71,15 +68,14 @@ def interpret():
     width = len(score.amplitude_map[0])
     height = len(score.amplitude_map)
 
-    for x in tqdm(range(width), 'generating events'):
-        time = (x / width) * config.length
-        for v_index in range(len(voices)):
+    for v in tqdm(range(len(voices)), 'generating events'):
+        voice = voices[v]
+        y = abs(int((v / len(voices)) * height) - height + 1)
+        for x in range(width):
             if rand.prob_bool(0.08):
-                y = abs(int((v_index / len(voices)) * height) - height + 1)
+                sample_pos = (x / width) * config.length * config.sample_rate
                 amp = score.amplitude_map[y][x]
-                voices[v_index].keyframes.append(Keyframe(time, amp))
-
-    for voice in voices:
+                voice.keyframes.append((sample_pos, amp))
         voice.finalize(False)
 
     return voices

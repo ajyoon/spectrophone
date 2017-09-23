@@ -18,15 +18,15 @@ class Oscillator:
         self.frequency = frequency
         self.last_played_sample = 0
 
-        self.period_length = round(config.framerate / self.frequency)
+        self.period_length = round(config.sample_rate / self.frequency)
 
-        if (self.frequency, config.framerate) in Oscillator.periods:
+        if (self.frequency, config.sample_rate) in Oscillator.periods:
             self.period_samples = Oscillator.periods[self.frequency]
         else:
             self.period_samples = (
                 numpy.sin(numpy.arange(self.period_length)
                           * (self.frequency
-                             * ((numpy.pi * 2) / config.framerate)))) * 32767
+                             * ((numpy.pi * 2) / config.sample_rate)))) * 32767
             Oscillator.periods[self.frequency] = self.period_samples
 
     def get_samples(self, num, amplitude):

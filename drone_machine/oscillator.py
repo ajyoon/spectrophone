@@ -42,6 +42,6 @@ class Oscillator:
         self.last_sample_i = chunk_tail_len
         return numpy.concatenate([
             last_period_tail,
-            numpy.tile(self.period_samples, tile_count) * amplitude,
+            numpy.tile(self.period_samples * amplitude, tile_count),
             self.period_samples[:chunk_tail_len] * amplitude
         ])

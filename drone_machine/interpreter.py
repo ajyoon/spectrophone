@@ -8,11 +8,11 @@ from tqdm import tqdm
 from blur import rand
 import numpy
 
-import config
-from voice import Voice
-from oscillator import Oscillator
-from score import Score
-from frequencies import frequencies
+from drone_machine import config
+from drone_machine.voice import Voice
+from drone_machine.oscillator import Oscillator
+from drone_machine.score import Score
+from drone_machine.frequencies import frequencies
 
 
 scale_pitches = {

@@ -3,10 +3,11 @@ import wave
 import numpy
 from tqdm import tqdm
 
-import config
-import rendering
-import interpreter
-import terminal
+
+from drone_machine import config
+from drone_machine import rendering
+from drone_machine import interpreter
+from drone_machine import terminal
 
 out_path = 'out.wav'
 

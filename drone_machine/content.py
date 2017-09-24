@@ -5,11 +5,10 @@ from blur.markov.graph import Graph
 from blur.soft import SoftFloat
 from blur import rand
 
-from voice import Voice
-from oscillator import Oscillator
-from agent import Agent
-
-from frequencies import frequencies
+from drone_machine.voice import Voice
+from drone_machine.oscillator import Oscillator
+from drone_machine.agent import Agent
+from drone_machine.frequencies import frequencies
 
 
 scale_pitches = {

@@ -1,4 +1,4 @@
-import config
+from drone_machine import config
 
 
 class Keyframe:

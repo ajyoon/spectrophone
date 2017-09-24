@@ -1,6 +1,6 @@
 import numpy
 
-import config
+from drone_machine import config
 
 
 class Voice:

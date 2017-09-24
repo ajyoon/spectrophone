@@ -1,4 +1,5 @@
 import multiprocessing
+import os
 
 import numpy
 
@@ -32,5 +33,5 @@ length = 60  # Seconds
 
 num_voices = 50
 
-
-score_path = 'resources/test.png'
+score_path = os.path.join(os.path.dirname(__file__),
+                          '..', 'resources', 'test.png')

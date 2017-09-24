@@ -1,4 +1,4 @@
-from keyframe import Keyframe
+from drone_machine.keyframe import Keyframe
 
 
 class Agent:

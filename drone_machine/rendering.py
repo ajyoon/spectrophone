@@ -8,8 +8,8 @@ import numpy
 
 from tqdm import tqdm
 
-import config
-import terminal
+from drone_machine import config
+from drone_machine import terminal
 
 
 def samples_needed(voices):

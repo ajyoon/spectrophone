@@ -9,41 +9,39 @@ class Oscillator:
 
     __slots__ = (
         'frequency',
-        'last_played_sample',
-        'period_length',
+        'last_sample_i',
         'period_samples',
         'last_amplitude'
     )
 
     def __init__(self, frequency):
         self.frequency = frequency
-        self.last_played_sample = 0
+        self.last_sample_i = 0
         self.last_amplitude = 0
 
-        self.period_length = round(config.sample_rate / self.frequency)
+        period_len = round(config.sample_rate / self.frequency)
 
         if (self.frequency, config.sample_rate) in Oscillator.periods:
             self.period_samples = Oscillator.periods[self.frequency]
         else:
             self.period_samples = (
-                numpy.sin(numpy.arange(self.period_length)
+                numpy.sin(numpy.arange(period_len)
                           * (self.frequency
                              * ((numpy.pi * 2) / config.sample_rate)))) * 32767
             Oscillator.periods[self.frequency] = self.period_samples
 
     def get_samples(self, num, amplitude):
-        if self.last_amplitude < config.silence_threshold < amplitude:
-            self.last_played_sample = 0
+        """Assumes `num > 2 * len(self.period_samples)`"""
+        last_period_tail = (self.period_samples[self.last_sample_i:]
+                            * self.last_amplitude)
         self.last_amplitude = amplitude
-        rolled_array = numpy.concatenate([
-            self.period_samples[self.last_played_sample:],
-            self.period_samples[:self.last_played_sample]
+        tile_count = (num - len(last_period_tail)) // len(self.period_samples)
+        chunk_tail_len = (num
+                          - (tile_count * len(self.period_samples))
+                          - len(last_period_tail))
+        self.last_sample_i = chunk_tail_len
+        return numpy.concatenate([
+            last_period_tail,
+            numpy.tile(self.period_samples, tile_count) * amplitude,
+            self.period_samples[:chunk_tail_len] * amplitude
         ])
-        full_count, remainder = divmod(num, self.period_length)
-        final_subarray = rolled_array[:remainder]
-        return_array = numpy.concatenate((numpy.tile(rolled_array, full_count),
-                                          final_subarray))
-
-        self.last_played_sample = ((self.last_played_sample + remainder) %
-                                   self.period_length)
-        return return_array * amplitude

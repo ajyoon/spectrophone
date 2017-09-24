@@ -1,5 +1,7 @@
 import numpy
 
+import config
+
 
 class Voice:
 
@@ -22,6 +24,9 @@ class Voice:
         """
         if keyframes_need_sort:
             self.keyframes.sort(key=lambda k: k[0])
+        # Prevent popping on voice entry
+        self.keyframes[0] = (self.keyframes[0][0], 0)
+        self.keyframes[-1] = (self.keyframes[-1][0], 0)
         self.keyframes = numpy.array(self.keyframes, dtype='uint32, f2')
 
     def get_samples_at(self, sample_pos, chunk_size):
@@ -37,19 +42,25 @@ class Voice:
         last_frame = self.keyframes[self.last_frame_i]
         next_frame = self.keyframes[self.last_frame_i + 1]
 
-        # Linear interpolate amplitude (inlined for speed)
-        amplitude = (
-            last_frame[1] + (
-                (sample_pos - last_frame[0]) * (
-                    (next_frame[1] - last_frame[1]) /
-                    (next_frame[0] - last_frame[0])
+        if (last_frame[1] == next_frame[1]):
+            amplitude = last_frame[1]
+        else:
+            # Linear interpolate amplitude (inlined for speed)
+            amplitude = (
+                last_frame[1] + (
+                    (sample_pos - last_frame[0]) * (
+                        (next_frame[1] - last_frame[1]) /
+                        (next_frame[0] - last_frame[0])
+                    )
                 )
             )
-        )
-
         # Prepare for next iteration
         if sample_pos >= self.keyframes[self.last_frame_i + 1][0]:
-                self.last_frame_i += 1
+            self.last_frame_i += 1
+
+        # Shortcut on silence
+        if (amplitude < config.silence_threshold):
+            return None
 
         # Render
         return self.oscillator.get_samples(chunk_size, amplitude)

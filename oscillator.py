@@ -11,12 +11,14 @@ class Oscillator:
         'frequency',
         'last_played_sample',
         'period_length',
-        'period_samples'
+        'period_samples',
+        'last_amplitude'
     )
 
     def __init__(self, frequency):
         self.frequency = frequency
         self.last_played_sample = 0
+        self.last_amplitude = 0
 
         self.period_length = round(config.sample_rate / self.frequency)
 
@@ -30,9 +32,9 @@ class Oscillator:
             Oscillator.periods[self.frequency] = self.period_samples
 
     def get_samples(self, num, amplitude):
-        if amplitude <= config.silence_threshold:
-            return None
-
+        if self.last_amplitude < config.silence_threshold < amplitude:
+            self.last_played_sample = 0
+        self.last_amplitude = amplitude
         rolled_array = numpy.concatenate([
             self.period_samples[self.last_played_sample:],
             self.period_samples[:self.last_played_sample]

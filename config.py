@@ -21,16 +21,16 @@ wave_params = (
 
 dtype = numpy.int16
 
-chunk_size = 4096
+chunk_size = 1024
 
 worker_data_size = 128_000_000 // 8  # 128Mb worth of 8-byte doubles
 processes = multiprocessing.cpu_count()
 
-silence_threshold = 0.0001
+silence_threshold = 2 / 255
 
 length = 60  # Seconds
 
-num_voices = 100000
+num_voices = 50
 
 
-score_path = 'resources/long.png'
+score_path = 'resources/test.png'

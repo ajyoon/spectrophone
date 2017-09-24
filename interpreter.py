@@ -58,14 +58,13 @@ octave_weights = [
 ]
 
 
-
 def interpret():
     voices = []
     for i in tqdm(range(config.num_voices), 'generating oscillators'):
         base_freq = rand.weighted_choice(scale_pitch_weights)
         detuned_freq = base_freq + rand.pos_or_neg(
             rand.weighted_rand(detune_weights))
-        freq = detuned_freq * rand.weighted_choice(octave_weights)
+        freq = round(detuned_freq * rand.weighted_choice(octave_weights), 1)
         voices.append(Voice(Oscillator(freq)))
 
     voices.sort(key=lambda v: v.oscillator.frequency)
@@ -79,6 +78,8 @@ def interpret():
                                               voices, n_groups),
                                           numpy.array_split(
                                               score.amplitude_map, n_groups)):
+        if not len(voice_group):
+            continue
         progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
         result_queue = multiprocessing.Queue(maxsize=1)
         process = multiprocessing.Process(
@@ -124,8 +125,8 @@ def interpret_worker(amplitude_map, voices, progress, result_queue):
 
     # Cache event decisions - use period length that unevenly divides score
     # width so different voices are not aligned
-    prob = max(height / len(voices) * 0.5, 0.0001)
-    event_prob = prob_bool_cycle(prob, width // 7)
+    prob = max(height / len(voices), 0.05)
+    event_prob = prob_bool_cycle(prob, int(width * (19 / 7)))
 
     sample_positions = [(x / width) * config.length * config.sample_rate
                         for x in range(width)]

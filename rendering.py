@@ -23,13 +23,15 @@ def normalize(array, value):
 
 
 def split_voices(voices, n_groups):
-    """Randomly breaak `voices` into a number of groups"""
-    voices = voices[:]
+    """Randomly breaak `voices` into a number of groups.
+
+    Warning: This modifies the contents of `voices`
+    """
     random.shuffle(voices)
     return numpy.array_split(voices, n_groups)
 
 
-class Work:
+class RenderWork:
     def __init__(self, process, progress, progress_bar):
         self.process = process
         self.progress = progress
@@ -50,7 +52,7 @@ def render(voices):
         process.start()
         progress_bar = tqdm(total=num_samples,
                             desc=f'rendering pid {process.pid}')
-        remaining_work.append(Work(process, progress, progress_bar))
+        remaining_work.append(RenderWork(process, progress, progress_bar))
 
     render_start_time = time.time()
 

@@ -29,9 +29,9 @@ processes = multiprocessing.cpu_count()
 
 silence_threshold = 2 / 255
 
-length = 60  # Seconds
+length = 60 * 2  # Seconds
 
-num_voices = 50
+num_voices = 10
 
 score_path = os.path.join(os.path.dirname(__file__),
                           '..', 'resources', 'test.png')

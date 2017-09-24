@@ -59,7 +59,8 @@ class Voice:
             self.last_frame_i += 1
 
         # Shortcut on silence
-        if (amplitude < config.silence_threshold):
+        if (amplitude < config.silence_threshold and
+                self.oscillator.last_amplitude < config.silence_threshold):
             return None
 
         # Render

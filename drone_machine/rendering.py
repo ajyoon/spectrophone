@@ -18,7 +18,7 @@ def samples_needed(voices):
 
 def normalize(array, value):
     max_value = max(array.max(), abs(array.min()))
-    factor = value / max_value
+    factor = value / max_value if max_value > 0 else 1
     array *= factor
 
 

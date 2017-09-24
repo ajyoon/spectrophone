@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 from drone_machine import config
 
@@ -10,7 +10,7 @@ class Oscillator:
     __slots__ = (
         'frequency',
         'last_sample_i',
-        'period_samples',
+        'period',
         'last_amplitude'
     )
 
@@ -22,26 +22,39 @@ class Oscillator:
         period_len = round(config.sample_rate / self.frequency)
 
         if (self.frequency, config.sample_rate) in Oscillator.periods:
-            self.period_samples = Oscillator.periods[self.frequency]
+            self.period = Oscillator.periods[self.frequency]
         else:
-            self.period_samples = (
-                numpy.sin(numpy.arange(period_len)
-                          * (self.frequency
-                             * ((numpy.pi * 2) / config.sample_rate)))) * 32767
-            Oscillator.periods[self.frequency] = self.period_samples
+            self.period = (
+                np.sin(np.arange(period_len)
+                       * (self.frequency
+                          * ((np.pi * 2) / config.sample_rate)))) * 32767
+            Oscillator.periods[self.frequency] = self.period
 
     def get_samples(self, num, amplitude):
-        """Assumes `num > 2 * len(self.period_samples)`"""
-        last_period_tail = (self.period_samples[self.last_sample_i:]
+        """Assumes `num > 2 * len(self.period)`"""
+        if amplitude <= config.silence_threshold:
+            if self.last_amplitude > config.silence_threshold:
+                last_period_tail = (self.period[self.last_sample_i:]
+                                    * self.last_amplitude)
+                samples = np.concatenate([
+                    last_period_tail,
+                    np.zeros(num - len(last_period_tail))
+                ])
+                self.last_amplitude = amplitude
+                self.last_sample_i = 0
+                return samples
+            else:
+                return None
+        last_period_tail = (self.period[self.last_sample_i:]
                             * self.last_amplitude)
         self.last_amplitude = amplitude
-        tile_count = (num - len(last_period_tail)) // len(self.period_samples)
+        tile_count = (num - len(last_period_tail)) // len(self.period)
         chunk_tail_len = (num
-                          - (tile_count * len(self.period_samples))
+                          - (tile_count * len(self.period))
                           - len(last_period_tail))
         self.last_sample_i = chunk_tail_len
-        return numpy.concatenate([
+        return np.concatenate([
             last_period_tail,
-            numpy.tile(self.period_samples * amplitude, tile_count),
-            self.period_samples[:chunk_tail_len] * amplitude
+            np.tile(self.period * amplitude, tile_count),
+            self.period[:chunk_tail_len] * amplitude
         ])

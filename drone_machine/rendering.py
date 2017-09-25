@@ -24,7 +24,8 @@ def split_voices(voices, n_groups):
     Warning: This modifies the contents of `voices`
     """
     random.shuffle(voices)
-    return numpy.array_split(voices, n_groups)
+    return [group for group in numpy.array_split(voices, n_groups)
+            if len(group)]
 
 
 class RenderWork:
@@ -35,6 +36,8 @@ class RenderWork:
 
 
 def render(osc_voices, sampler_voices):
+    render_start_time = time.time()
+
     num_samples = config.sample_rate * config.length
     data_array = multiprocessing.Array(ctypes.c_double, num_samples)
 
@@ -54,8 +57,6 @@ def render(osc_voices, sampler_voices):
         progress_bar = tqdm(total=num_samples,
                             desc='rendering pid ' + str(process.pid))
         remaining_work.append(RenderWork(process, progress, progress_bar))
-
-    render_start_time = time.time()
 
     # `osc_voices` and `osc_voice_groups` are potentially large, and we don't
     # need them anymore, so let the GC know we're done with them.

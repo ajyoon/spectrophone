@@ -29,13 +29,17 @@ processes = multiprocessing.cpu_count()
 
 silence_threshold = 2 / 255
 
-length = 60 * 2 # Seconds
+length = 60 * 10  # Seconds
 
 num_osc_voices = 0
-num_sampler_voices = 100
+num_sampler_voices = 1
+
+sampler_step = int(0.1 * sample_rate)
+
+sampler_event_prob_factor = 0.03
 
 score_path = os.path.join(os.path.dirname(__file__),
-                          '..', 'resources', 'gradient.png')
+                          '..', 'resources', 'long.png')
 
 samples_dir = os.path.join(os.path.dirname(__file__), '..', 'resources')
 samples_paths = {

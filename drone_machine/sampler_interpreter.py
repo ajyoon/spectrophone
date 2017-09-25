@@ -37,11 +37,11 @@ def interpret(score):
 
     avg_map = np.average(score.amplitude_map, 0)
 
-    for x in tqdm(range(len(avg_map)), 'interpreting samplers'):
+    for event_pos in tqdm(range(0, n_total_samples, config.sampler_step),
+                          'interpreting samplers'):
+        x = int(event_pos / n_total_samples * len(avg_map))
         avg = avg_map[x]
-        if rand.prob_bool(avg * 100):
-            event_pos = int((x / len(avg_map))
-                            * n_total_samples)
+        if rand.prob_bool(avg * config.sampler_event_prob_factor):
             length = min(int(rand.weighted_rand(length_weights)),
                          n_total_samples - event_pos)
             sample_pos = random.randint(0, len(sampler.samples) - length - 1)

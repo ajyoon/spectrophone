@@ -1,8 +1,7 @@
 import gc
 
-import numpy
+import numpy as np
 from PIL import Image, ImageOps
-from tqdm import tqdm
 
 
 class Score:
@@ -19,10 +18,6 @@ class Score:
 
     @staticmethod
     def create_amplitude_map(image):
-        out_data = numpy.ndarray((image.size[1], image.size[0]), dtype='f2')
+        print('preparing amplitude map')
         inverted_greyscale = ImageOps.invert(image.convert('L'))
-
-        for y in tqdm(range(len(out_data)), 'preparing amplitude map'):
-            for x in range(len(out_data[0])):
-                out_data[y][x] = inverted_greyscale.getpixel((x, y)) / 255
-        return out_data
+        return np.asarray(inverted_greyscale, dtype='f2') / 255

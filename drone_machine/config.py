@@ -22,16 +22,24 @@ wave_params = (
 
 dtype = numpy.int16
 
-chunk_size = 1024
+chunk_size = 2048
 
 worker_data_size = 128_000_000 // 8  # 128Mb worth of 8-byte doubles
 processes = multiprocessing.cpu_count()
 
 silence_threshold = 2 / 255
 
-length = 60 * 2  # Seconds
+length = 60 * 2 # Seconds
 
-num_voices = 10
+num_osc_voices = 0
+num_sampler_voices = 100
 
 score_path = os.path.join(os.path.dirname(__file__),
-                          '..', 'resources', 'test.png')
+                          '..', 'resources', 'gradient.png')
+
+samples_dir = os.path.join(os.path.dirname(__file__), '..', 'resources')
+samples_paths = {
+    filename: os.path.join(samples_dir, filename)
+    for filename in [
+        'cage_feldman.wav'
+    ]}

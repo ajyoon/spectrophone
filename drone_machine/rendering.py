@@ -12,10 +12,6 @@ from drone_machine import config
 from drone_machine import terminal
 
 
-def samples_needed(voices):
-    return int(max(v.keyframes[-1][0] for v in voices))
-
-
 def normalize(array, value):
     max_value = max(array.max(), abs(array.min()))
     factor = value / max_value if max_value > 0 else 1
@@ -38,28 +34,33 @@ class RenderWork:
         self.progress_bar = progress_bar
 
 
-def render(voices):
-    num_samples = samples_needed(voices)
+def render(osc_voices, sampler_voices):
+    num_samples = config.sample_rate * config.length
     data_array = multiprocessing.Array(ctypes.c_double, num_samples)
-    voice_groups = split_voices(voices, config.processes)
+
+    if sampler_voices:
+        render_samplers(sampler_voices, data_array)
+
+    # Render oscillators
+    osc_voice_groups = split_voices(osc_voices, config.processes)
 
     remaining_work = []
-    for group in voice_groups:
+    for group in osc_voice_groups:
         progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
         process = multiprocessing.Process(
-            target=render_worker,
+            target=render_osc_worker,
             args=(group, data_array, 0, num_samples, progress))
         process.start()
         progress_bar = tqdm(total=num_samples,
-                            desc=f'rendering pid {process.pid}')
+                            desc='rendering pid ' + str(process.pid))
         remaining_work.append(RenderWork(process, progress, progress_bar))
 
     render_start_time = time.time()
 
-    # `voices` and `voice_groups` are potentially large, and we don't need
-    # them anymore, so let the GC know we're done with them.
-    del voices
-    del voice_groups
+    # `osc_voices` and `osc_voice_groups` are potentially large, and we don't
+    # need them anymore, so let the GC know we're done with them.
+    del osc_voices
+    del osc_voice_groups
     gc.collect()
 
     while True:
@@ -95,7 +96,7 @@ def write_samples(chunks, data_array, offset):
         np_array += samples
 
 
-def render_worker(voices, data_array, start, end, progress):
+def render_osc_worker(osc_voices, data_array, start, end, progress):
     """Worker process method. Mutates data_array in place with locking."""
     chunks = []
     max_chunks = ((config.worker_data_size * random.uniform(0.8, 1.2))
@@ -103,7 +104,7 @@ def render_worker(voices, data_array, start, end, progress):
     last_write_pos = 0
     for pos in range(start, end + config.chunk_size, config.chunk_size):
         chunk = numpy.zeros(config.chunk_size)
-        for voice in voices:
+        for voice in osc_voices:
             voice_samples = voice.get_samples_at(pos, config.chunk_size)
             if voice_samples is not None:
                 chunk += voice_samples
@@ -122,18 +123,33 @@ def render_worker(voices, data_array, start, end, progress):
     write_samples(chunks, data_array, last_write_pos)
 
 
-def render_with_single_process(voices):
+def render_samplers(sampler_voices, data_array):
+    with data_array.get_lock():
+        out_array = numpy.frombuffer(data_array.get_obj())
+        for voice in tqdm(sampler_voices, 'rendering samplers'):
+            for event in voice.events:
+                start = event.event_pos
+                stop = start + event.length
+                out_array[start:stop] += voice.sampler.get_samples(
+                    event.sample_pos,
+                    event.length,
+                    event.amp,
+                    event.fade_in_len,
+                    event.fade_out_len)
+
+
+def render_with_single_process(osc_voices):
     """Single-process version of `render`
 
     Used for profiling purposes.
     """
-    num_samples = samples_needed(voices)
+    num_samples = samples_needed(osc_voices)
     data_array = multiprocessing.Array(ctypes.c_double, num_samples)
-    voice_groups = split_voices(voices, config.processes)
+    osc_voice_groups = split_voices(osc_voices, config.processes)
 
-    for group in tqdm(voice_groups):
+    for group in tqdm(osc_voice_groups):
         progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
-        render_worker(group, data_array, 0, num_samples, progress)
+        render_osc_worker(group, data_array, 0, num_samples, progress)
 
     render_start_time = time.time()
 

@@ -58,9 +58,9 @@ octave_weights = [
 ]
 
 
-def interpret():
+def interpret(score):
     voices = []
-    for i in tqdm(range(config.num_voices), 'generating oscillators'):
+    for i in tqdm(range(config.num_osc_voices), 'generating oscillators'):
         base_freq = rand.weighted_choice(scale_pitch_weights)
         detuned_freq = base_freq + rand.pos_or_neg(
             rand.weighted_rand(detune_weights))
@@ -68,9 +68,6 @@ def interpret():
         voices.append(Voice(Oscillator(freq)))
 
     voices.sort(key=lambda v: v.oscillator.frequency)
-
-    print('interpreting score...')
-    score = Score(config.score_path)
 
     n_groups = config.processes
     remaining_work = []

@@ -137,29 +137,3 @@ def render_samplers(sampler_voices, data_array):
                     event.amp,
                     event.fade_in_len,
                     event.fade_out_len)
-
-
-def render_with_single_process(osc_voices):
-    """Single-process version of `render`
-
-    Used for profiling purposes.
-    """
-    num_samples = samples_needed(osc_voices)
-    data_array = multiprocessing.Array(ctypes.c_double, num_samples)
-    osc_voice_groups = split_voices(osc_voices, config.processes)
-
-    for group in tqdm(osc_voice_groups):
-        progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
-        render_osc_worker(group, data_array, 0, num_samples, progress)
-
-    render_start_time = time.time()
-
-    time_elapsed = round(time.time() - render_start_time, 1)
-    print(f'sample rendering completed in {time_elapsed} seconds...')
-    samples = numpy.frombuffer(data_array.get_obj())
-
-    print('normalizing data...')
-    normalize(samples, 32767)
-
-    print(f'converting to output dtype {config.dtype.__name__}')
-    return samples.astype(config.dtype)

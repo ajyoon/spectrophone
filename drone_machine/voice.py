@@ -27,7 +27,7 @@ class Voice:
         # Prevent popping on voice entry
         self.keyframes[0] = (self.keyframes[0][0], 0)
         self.keyframes[-1] = (self.keyframes[-1][0], 0)
-        self.keyframes = numpy.array(self.keyframes, dtype='uint32, f2')
+        self.keyframes = numpy.array(self.keyframes, dtype='uint32, f16')
 
     def get_samples_at(self, sample_pos, chunk_size):
         """Get a chunk of `chunk_size` from the voice at `sample_pos`.
@@ -38,14 +38,13 @@ class Voice:
             return self.oscillator.get_samples(chunk_size,
                                                self.keyframes[-1][1])
 
-        # Safe against index errors assuming `finalize` has been called.
         last_frame = self.keyframes[self.last_frame_i]
         next_frame = self.keyframes[self.last_frame_i + 1]
 
         if (last_frame[1] == next_frame[1]):
             amplitude = last_frame[1]
         else:
-            # Linear interpolate amplitude (inlined for speed)
+            # Linear interpolate amplitude
             amplitude = (
                 last_frame[1] + (
                     (sample_pos - last_frame[0]) * (

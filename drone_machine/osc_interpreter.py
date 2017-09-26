@@ -6,12 +6,11 @@ import itertools
 
 from tqdm import tqdm
 from blur import rand
-import numpy
+import numpy as np
 
 from drone_machine import config
 from drone_machine.voice import Voice
 from drone_machine.oscillator import Oscillator
-from drone_machine.score import Score
 from drone_machine.frequencies import frequencies
 
 
@@ -71,9 +70,9 @@ def interpret(score):
 
     n_groups = config.processes
     remaining_work = []
-    for voice_group, amp_map_slice in zip(numpy.array_split(
+    for voice_group, amp_map_slice in zip(np.array_split(
                                               voices, n_groups)[::-1],
-                                          numpy.array_split(
+                                          np.array_split(
                                               score.amplitude_map, n_groups)):
         if not len(voice_group):
             continue
@@ -125,16 +124,16 @@ def interpret_worker(amplitude_map, voices, progress, result_queue):
     prob = max(height / len(voices), 0.05)
     event_prob = prob_bool_cycle(prob, int(width * (19 / 7)))
 
-    sample_positions = [(x / width) * config.length * config.sample_rate
-                        for x in range(width)]
     y_voice_map = [abs(int((v / len(voices)) * height) - height + 1)
                    for v in range(len(voices))]
 
     for v in range(len(voices)):
         voice = voices[v]
-        for x in range(width):
+        for event_pos in range(0, config.total_samples,
+                               config.osc_step):
             if next(event_prob):
-                voice.keyframes.append((sample_positions[x],
+                x = int((event_pos / config.total_samples) * width)
+                voice.keyframes.append((event_pos,
                                         amplitude_map[y_voice_map[v]][x]))
         voice.finalize(False)
         progress.value = v

@@ -33,17 +33,17 @@ amp_factor_weights = [
 def interpret(score):
     sampler = Sampler(config.samples_paths['cage_feldman.wav'])
     sampler_voice = SamplerVoice(sampler)
-    n_total_samples = config.sample_rate * config.length
 
     avg_map = np.average(score.amplitude_map, 0)
 
-    for event_pos in tqdm(range(0, n_total_samples, config.sampler_step),
+    for event_pos in tqdm(range(0, config.total_samples,
+                                config.sampler_step),
                           'interpreting samplers'):
-        x = int(event_pos / n_total_samples * len(avg_map))
+        x = int(event_pos / config.total_samples * len(avg_map))
         avg = avg_map[x]
         if rand.prob_bool(avg * config.sampler_event_prob_factor):
             length = min(int(rand.weighted_rand(length_weights)),
-                         n_total_samples - event_pos)
+                         config.total_samples - event_pos)
             sample_pos = random.randint(0, len(sampler.samples) - length - 1)
             amp = avg * rand.weighted_rand(amp_factor_weights)
             sampler_voice.events.append(

@@ -27,23 +27,24 @@ chunk_size = 2048
 worker_data_size = 128_000_000 // 8  # 128Mb worth of 8-byte doubles
 processes = multiprocessing.cpu_count()
 
-silence_threshold = 2 / 255
+silence_threshold = 1 / 255
 
-length = 60  # Seconds
+length = 60 * 10  # Seconds
+total_samples = length * sample_rate
 
 num_osc_voices = 1000
 num_sampler_voices = 1
 
 sampler_step = int(0.1 * sample_rate)
+osc_step = int(0.1 * sample_rate)
 
 sampler_event_prob_factor = 0.03
-
 
 resources_dir = os.path.abspath(
     os.path.join(os.path.dirname(__file__),
                  '..', 'resources'))
 
-score_file_name = 'many_lines.png'
+score_file_name = 'score.png'
 score_path = os.path.join(resources_dir, score_file_name)
 
 samples_paths = {

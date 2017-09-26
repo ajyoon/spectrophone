@@ -41,7 +41,7 @@ scale_pitch_weights = [
 ]
 
 detune_weights = [
-    (0, 100),
+    (0, 40),
     (2, 10),
     (20, 1),
     (50, 0),
@@ -72,7 +72,7 @@ def interpret(score):
     n_groups = config.processes
     remaining_work = []
     for voice_group, amp_map_slice in zip(numpy.array_split(
-                                              voices, n_groups),
+                                              voices, n_groups)[::-1],
                                           numpy.array_split(
                                               score.amplitude_map, n_groups)):
         if not len(voice_group):

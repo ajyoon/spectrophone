@@ -29,21 +29,25 @@ processes = multiprocessing.cpu_count()
 
 silence_threshold = 2 / 255
 
-length = 60 * 10  # Seconds
+length = 60  # Seconds
 
-num_osc_voices = 0
+num_osc_voices = 1000
 num_sampler_voices = 1
 
 sampler_step = int(0.1 * sample_rate)
 
 sampler_event_prob_factor = 0.03
 
-score_path = os.path.join(os.path.dirname(__file__),
-                          '..', 'resources', 'long.png')
 
-samples_dir = os.path.join(os.path.dirname(__file__), '..', 'resources')
+resources_dir = os.path.abspath(
+    os.path.join(os.path.dirname(__file__),
+                 '..', 'resources'))
+
+score_file_name = 'many_lines.png'
+score_path = os.path.join(resources_dir, score_file_name)
+
 samples_paths = {
-    filename: os.path.join(samples_dir, filename)
+    filename: os.path.join(resources_dir, filename)
     for filename in [
         'cage_feldman.wav'
     ]}

@@ -30,4 +30,5 @@ with wave.open(out_path, 'wb') as out:
     for write_chunk in tqdm(write_chunks, f'writing to {out_path}'):
         out.writeframes(write_chunk)
 
+terminal.bell()
 print(f'drone machine finished successfully. data written to {out_path}')

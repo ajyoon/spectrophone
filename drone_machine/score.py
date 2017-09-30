@@ -14,6 +14,6 @@ class Score:
 
     @staticmethod
     def create_amplitude_map(image):
-        print('preparing amplitude map')
+        print('preparing amplitude map...')
         inverted_greyscale = ImageOps.invert(image.convert('L'))
         return np.array(inverted_greyscale).astype('f2') / 255

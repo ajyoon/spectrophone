@@ -40,7 +40,7 @@ scale_pitch_weights = [
 ]
 
 detune_weights = [
-    (0, 40),
+    (0, 200),
     (2, 10),
     (20, 1),
     (50, 0),
@@ -115,22 +115,27 @@ class InterpretWork:
         self.result_queue = result_queue
 
 
+def prob_bool_cycle(prob, length):
+    return itertools.cycle([rand.prob_bool(prob) for i in range(length)])
+
+
 def interpret_worker(amplitude_map, voices, progress, result_queue):
     width = len(amplitude_map[0])
     height = len(amplitude_map)
 
     # Cache event decisions - use period length that unevenly divides score
     # width so different voices are not aligned
-    prob = max(height / len(voices), 0.05)
-    event_prob = prob_bool_cycle(prob, int(width * (19 / 7)))
+    prob = max((height / len(voices)) / 10, 0.00001)
+    event_positions = range(0, config.total_samples, config.osc_step)
+    num_events = config.total_samples // config.osc_step
+    event_prob = prob_bool_cycle(prob, int(num_events * (19 / 7)))
 
     y_voice_map = [abs(int((v / len(voices)) * height) - height + 1)
                    for v in range(len(voices))]
 
     for v in range(len(voices)):
         voice = voices[v]
-        for event_pos in range(0, config.total_samples,
-                               config.osc_step):
+        for event_pos in event_positions:
             if next(event_prob):
                 x = int((event_pos / config.total_samples) * width)
                 voice.keyframes.append((event_pos,
@@ -139,8 +144,3 @@ def interpret_worker(amplitude_map, voices, progress, result_queue):
         progress.value = v
 
     result_queue.put([v for v in voices if len(v.keyframes)])
-
-
-def prob_bool_cycle(prob, length):
-    unrolled = [rand.prob_bool(prob) for i in range(length)]
-    return itertools.cycle(unrolled)

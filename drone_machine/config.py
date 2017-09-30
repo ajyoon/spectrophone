@@ -33,23 +33,12 @@ length = 60 * 10  # Seconds
 total_samples = length * sample_rate
 
 num_osc_voices = 0
-num_sampler_voices = 1
 
-sampler_step = int(sample_rate / 100)
 osc_step = int(sample_rate / 10)
-
-sampler_event_prob_factor = 5
 
 resources_dir = os.path.abspath(
     os.path.join(os.path.dirname(__file__),
                  '..', 'resources'))
 
-score_file_name = 'score.png'
+score_file_name = 'line.png'
 score_path = os.path.join(resources_dir, score_file_name)
-
-samples_paths = {
-    filename: os.path.join(resources_dir, filename)
-    for filename in [
-        'cage_feldman.wav',
-        'voice.wav'
-    ]}

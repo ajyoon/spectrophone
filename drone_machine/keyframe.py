@@ -22,4 +22,4 @@ class Keyframe:
         """
         self.time = time
         self.amplitude = amplitude
-        self.sample_pos = int(config.framerate * self.time)
+        self.sample_pos = int(config.sample_rate * self.time)

@@ -9,6 +9,8 @@ from drone_machine import osc_interpreter
 from drone_machine import sampler_interpreter
 from drone_machine import terminal
 from drone_machine.score import Score
+from drone_machine.content import test
+
 
 out_path = 'out.wav'
 
@@ -19,7 +21,7 @@ print('interpreting score...')
 score = Score(config.score_path)
 
 osc_voices = osc_interpreter.interpret(score)
-sampler_voices = [sampler_interpreter.interpret(score)]
+sampler_voices = sampler_interpreter.interpret(score, test.samplers)
 samples = rendering.render(osc_voices, sampler_voices)
 
 with wave.open(out_path, 'wb') as out:

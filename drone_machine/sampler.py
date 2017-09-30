@@ -1,4 +1,8 @@
+import os
+
 import numpy as np
+
+from drone_machine import config
 
 
 class Sampler:
@@ -8,15 +12,28 @@ class Sampler:
     Assumes the file is mono-channel and encoded in signed 16-bit integers.
     """
 
-    def __init__(self, source_path):
-        self.source_path = source_path
-        self.samples = Sampler._load_samples(source_path)
+    def __init__(self, source, step, event_prob_factor, length_weights,
+                 amp_factor_weights):
+        self.source = source
+        self.step = step
+        self.event_prob_factor = event_prob_factor
+        self.length_weights = length_weights
+        self.amp_factor_weights = amp_factor_weights
+        self.samples = Sampler._load_samples(self._abs_source_path)
 
     def get_samples(self, pos, length, amp, fade_in_len, fade_out_len):
         samples = self.samples[pos:pos + length].astype(np.float64)
         samples[:fade_in_len] *= Sampler._fade_in_ramp(fade_in_len, amp)
         samples[-fade_in_len:] *= Sampler._fade_out_ramp(fade_out_len, amp)
         return samples
+
+    @property
+    def fade_length(self):
+        return int(self.length_weights[0][0] / 3)
+
+    @property
+    def _abs_source_path(self):
+        return os.path.join(config.resources_dir, self.source)
 
     @staticmethod
     def _fade_in_ramp(length, end_amp):

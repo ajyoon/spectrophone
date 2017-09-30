@@ -1,6 +1,14 @@
+from tqdm import tqdm
+from blur import rand
+
 from drone_machine import config
 from drone_machine.sampler import Sampler
+from drone_machine.oscillator import Oscillator
+from drone_machine.frequencies import frequencies
+from drone_machine.content import fuzzy_osc_gen
 
+
+# Samplers ####################################################################
 
 length_weights = [(w[0] * config.sample_rate, w[1]) for w in [
     # (seconds, weight)
@@ -28,3 +36,49 @@ samplers = [
         amp_factor_weights=amp_factor_weights
     ),
 ]
+
+
+# Oscillators #################################################################
+
+
+pitches = {
+    'gf': frequencies[6],
+    'bf': frequencies[10],
+    'c': frequencies[0] * 2,
+    'df': frequencies[1] * 2,
+    'ef': frequencies[3] * 2,
+    'f': frequencies[5] * 2
+}
+
+pitch_weights = [
+    (pitches['gf'], 5),
+    (pitches['bf'], 5),
+    (pitches['c'], 7),
+    (pitches['df'], 3),
+    (pitches['ef'], 1),
+    (pitches['f'], 3),
+]
+
+detune_weights = [
+    (0, 200),
+    (2, 10),
+    (20, 1),
+    (50, 0),
+]
+
+octave_weights = [
+    (1/8, 5),
+    (1/4, 15),
+    (1/2, 35),
+    (1, 7),
+    (2, 1),
+    (4, 0.5),
+    (8, 0.1),
+]
+
+oscillators = fuzzy_osc_gen.generate(
+    num=5,
+    pitch_weights=pitch_weights,
+    detune_weights=detune_weights,
+    octave_weights=octave_weights
+)

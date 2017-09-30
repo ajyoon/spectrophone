@@ -14,13 +14,9 @@ from drone_machine.content import test
 
 out_path = 'out.wav'
 
-terminal.clear()
-print('drone machine armed...')
-
-print('interpreting score...')
 score = Score(config.score_path)
 
-osc_voices = osc_interpreter.interpret(score)
+osc_voices = osc_interpreter.interpret(score, test.oscillators)
 sampler_voices = sampler_interpreter.interpret(score, test.samplers)
 samples = rendering.render(osc_voices, sampler_voices)
 

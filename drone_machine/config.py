@@ -32,8 +32,6 @@ silence_threshold = 1 / 255
 length = 60 * 10  # Seconds
 total_samples = length * sample_rate
 
-num_osc_voices = 0
-
 osc_step = int(sample_rate / 10)
 
 resources_dir = os.path.abspath(

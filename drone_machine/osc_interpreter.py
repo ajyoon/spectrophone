@@ -10,63 +10,10 @@ import numpy as np
 
 from drone_machine import config
 from drone_machine.voice import Voice
-from drone_machine.oscillator import Oscillator
-from drone_machine.frequencies import frequencies
 
 
-scale_pitches = {
-    'gf': frequencies[6],
-    'bf': frequencies[10],
-    'c': frequencies[0] * 2,
-    'df': frequencies[1] * 2,
-    'ef': frequencies[3] * 2,
-    'f': frequencies[5] * 2
-}
-
-main_pitch_weights = [
-    (scale_pitches['gf'], 10),
-    (scale_pitches['bf'], 7),
-    (scale_pitches['df'], 10),
-    (scale_pitches['f'], 3),
-]
-
-scale_pitch_weights = [
-    (scale_pitches['gf'], 5),
-    (scale_pitches['bf'], 5),
-    (scale_pitches['c'], 7),
-    (scale_pitches['df'], 3),
-    (scale_pitches['ef'], 1),
-    (scale_pitches['f'], 3),
-]
-
-detune_weights = [
-    (0, 200),
-    (2, 10),
-    (20, 1),
-    (50, 0),
-]
-
-octave_weights = [
-    (1/8, 5),
-    (1/4, 15),
-    (1/2, 35),
-    (1, 7),
-    (2, 1),
-    (4, 0.5),
-    (8, 0.1),
-]
-
-
-def interpret(score):
-    voices = []
-    for i in tqdm(range(config.num_osc_voices), 'generating oscillators'):
-        base_freq = rand.weighted_choice(scale_pitch_weights)
-        detuned_freq = base_freq + rand.pos_or_neg(
-            rand.weighted_rand(detune_weights))
-        freq = round(detuned_freq * rand.weighted_choice(octave_weights), 1)
-        voices.append(Voice(Oscillator(freq)))
-
-    voices.sort(key=lambda v: v.oscillator.frequency)
+def interpret(score, oscillators):
+    voices = [Voice(o) for o in sorted(oscillators, key=lambda o: o.frequency)]
 
     n_groups = config.processes
     remaining_work = []

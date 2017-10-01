@@ -37,6 +37,3 @@ osc_step = int(sample_rate / 10)
 resources_dir = os.path.abspath(
     os.path.join(os.path.dirname(__file__),
                  '..', 'resources'))
-
-score_file_name = 'line.png'
-score_path = os.path.join(resources_dir, score_file_name)

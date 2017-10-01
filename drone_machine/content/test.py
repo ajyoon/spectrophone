@@ -1,11 +1,10 @@
-from tqdm import tqdm
-from blur import rand
+import os
 
 from drone_machine import config
 from drone_machine.sampler import Sampler
-from drone_machine.oscillator import Oscillator
 from drone_machine.frequencies import frequencies
 from drone_machine.content import fuzzy_osc_gen
+from drone_machine.score import Score
 
 
 # Samplers ####################################################################
@@ -31,7 +30,14 @@ samplers = [
     Sampler(
         source='cage_feldman.wav',
         step=config.sample_rate // 10,
-        event_prob_factor=5,
+        event_prob_factor=1,
+        length_weights=length_weights,
+        amp_factor_weights=amp_factor_weights
+    ),
+    Sampler(
+        source='watts.wav',
+        step=config.sample_rate // 10,
+        event_prob_factor=1,
         length_weights=length_weights,
         amp_factor_weights=amp_factor_weights
     ),
@@ -60,7 +66,7 @@ pitch_weights = [
 ]
 
 detune_weights = [
-    (0, 200),
+    (0, 70),
     (2, 10),
     (20, 1),
     (50, 0),
@@ -77,8 +83,15 @@ octave_weights = [
 ]
 
 oscillators = fuzzy_osc_gen.generate(
-    num=5,
+    num=300,
     pitch_weights=pitch_weights,
     detune_weights=detune_weights,
     octave_weights=octave_weights
 )
+
+
+# Score #######################################################################
+
+score_file_name = 'score.png'
+score_path = os.path.join(config.resources_dir, score_file_name)
+score = Score(score_path)

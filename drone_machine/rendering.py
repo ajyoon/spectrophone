@@ -38,8 +38,7 @@ class RenderWork:
 def render(osc_voices, sampler_voices):
     render_start_time = time.time()
 
-    num_samples = config.sample_rate * config.length
-    data_array = multiprocessing.Array(ctypes.c_double, num_samples)
+    data_array = multiprocessing.Array(ctypes.c_double, config.total_samples)
 
     if sampler_voices:
         render_samplers(sampler_voices, data_array)
@@ -52,9 +51,9 @@ def render(osc_voices, sampler_voices):
         progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
         process = multiprocessing.Process(
             target=render_osc_worker,
-            args=(group, data_array, 0, num_samples, progress))
+            args=(group, data_array, 0, config.total_samples, progress))
         process.start()
-        progress_bar = tqdm(total=num_samples,
+        progress_bar = tqdm(total=config.total_samples,
                             desc='rendering pid ' + str(process.pid))
         remaining_work.append(RenderWork(process, progress, progress_bar))
 

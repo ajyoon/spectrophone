@@ -19,7 +19,14 @@ length_weights = [(w[0] * config.sample_rate, w[1]) for w in [
     (10, 0)
 ]]
 
-amp_factor_weights = [
+cage_amp_factor_weights = [
+    (0.1, 20),
+    (0.5, 4),
+    (1, 1),
+    (3, 0)
+]
+
+watts_amp_factor_weights = [
     (0.1, 50),
     (0.5, 3),
     (1, 1),
@@ -29,23 +36,21 @@ amp_factor_weights = [
 samplers = [
     Sampler(
         source='cage_feldman.wav',
-        step=config.sample_rate // 10,
+        step=int(config.sample_rate // 10),
         event_prob_factor=1,
         length_weights=length_weights,
-        amp_factor_weights=amp_factor_weights
+        amp_factor_weights=cage_amp_factor_weights
     ),
     Sampler(
         source='watts.wav',
-        step=config.sample_rate // 10,
+        step=int(config.sample_rate // 10),
         event_prob_factor=1,
         length_weights=length_weights,
-        amp_factor_weights=amp_factor_weights
+        amp_factor_weights=watts_amp_factor_weights
     ),
 ]
 
-
 # Oscillators #################################################################
-
 
 pitches = {
     'gf': frequencies[6],
@@ -57,7 +62,7 @@ pitches = {
 }
 
 pitch_weights = [
-    (pitches['gf'], 5),
+    (pitches['gf'], 8),
     (pitches['bf'], 5),
     (pitches['c'], 7),
     (pitches['df'], 3),
@@ -66,24 +71,35 @@ pitch_weights = [
 ]
 
 detune_weights = [
-    (0, 70),
-    (2, 10),
-    (20, 1),
+    (0, 45),
+    (1, 10),
+    (2, 6),
+    (20, 2),
     (50, 0),
 ]
 
+# octave_weights = [
+#     (1/8, 5),
+#     (1/4, 15),
+#     (1/2, 35),
+#     (1, 20),
+#     (2, 3),
+#     (4, 0.5),
+#     (8, 0.1),
+# ]
+
 octave_weights = [
-    (1/8, 5),
-    (1/4, 15),
-    (1/2, 35),
-    (1, 7),
-    (2, 1),
-    (4, 0.5),
+    (1/8, 1),
+    (1/4, 25),
+    (1/2, 20),
+    (1, 20),
+    (2, 15),
+    (4, 1),
     (8, 0.1),
 ]
 
 oscillators = fuzzy_osc_gen.generate(
-    num=300,
+    num=1200,
     pitch_weights=pitch_weights,
     detune_weights=detune_weights,
     octave_weights=octave_weights
@@ -92,6 +108,6 @@ oscillators = fuzzy_osc_gen.generate(
 
 # Score #######################################################################
 
-score_file_name = 'score.png'
+score_file_name = 'scorev2.png'
 score_path = os.path.join(config.resources_dir, score_file_name)
 score = Score(score_path)

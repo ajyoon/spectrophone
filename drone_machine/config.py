@@ -24,15 +24,15 @@ dtype = numpy.int16
 
 chunk_size = 2048
 
-worker_data_size = 128_000_000 // 8  # 128Mb worth of 8-byte doubles
+worker_data_size = 400_000_000 // 8  # ~n Mb worth of 8-byte doubles
 processes = multiprocessing.cpu_count()
 
 silence_threshold = 1 / 255
 
-length = 60 * 10  # Seconds
-total_samples = length * sample_rate
+length = 60 * 80  # Seconds
+total_samples = int(length * sample_rate)
 
-osc_step = int(sample_rate / 10)
+osc_step = int(sample_rate / 50)
 
 resources_dir = os.path.abspath(
     os.path.join(os.path.dirname(__file__),

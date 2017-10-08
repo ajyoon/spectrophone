@@ -13,4 +13,4 @@ def generate(num, pitch_weights, detune_weights,
             rand.weighted_rand(detune_weights))
         freq = round(detuned_freq * rand.weighted_choice(octave_weights), 1)
         oscillators.append(Oscillator(freq))
-    return oscillators
+    return sorted(oscillators, key=lambda o: o.frequency)

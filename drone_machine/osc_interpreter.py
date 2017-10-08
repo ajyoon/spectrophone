@@ -13,7 +13,7 @@ from drone_machine.voice import Voice
 
 
 def interpret(score, oscillators):
-    voices = [Voice(o) for o in sorted(oscillators, key=lambda o: o.frequency)]
+    voices = [Voice(o) for o in oscillators]
 
     n_groups = config.processes
     remaining_work = []

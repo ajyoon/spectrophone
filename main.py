@@ -8,8 +8,8 @@ from drone_machine.content import test
 
 out_path = 'out.wav'
 
-osc_voices = osc_interpreter.interpret(test.score, test.oscillators)
 sampler_voices = sampler_interpreter.interpret(test.score, test.samplers)
+osc_voices = osc_interpreter.interpret(test.score, test.oscillators)
 samples = rendering.render(osc_voices, sampler_voices)
 
 writer.write('out.wav', samples)

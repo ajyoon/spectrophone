@@ -104,8 +104,11 @@ venv.bak/
 # debugging outputs
 *.wav
 
-# resources (for now)
+# resources
 resources/
+
+# temp files
+.tmp/
 
 # Emacs
 .#*

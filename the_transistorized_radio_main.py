@@ -3,7 +3,7 @@ from spectrophone import osc_interpreter
 from spectrophone import sampler_interpreter
 from spectrophone import terminal
 from spectrophone import writer
-from spectrophone.content import the_transistorized_radio as content
+from content import the_transistorized_radio as content
 
 
 out_path = 'out.wav'

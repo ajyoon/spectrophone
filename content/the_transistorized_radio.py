@@ -3,7 +3,7 @@ import os
 from spectrophone import config
 from spectrophone.sampler import Sampler
 from spectrophone.frequencies import frequencies
-from spectrophone.content import fuzzy_osc_gen
+from content import fuzzy_osc_gen
 from spectrophone.score import Score
 
 

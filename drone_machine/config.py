@@ -24,7 +24,7 @@ dtype = numpy.int16
 
 chunk_size = 2048
 
-worker_data_size = 400_000_000 // 8  # ~n Mb worth of 8-byte doubles
+worker_data_size = 800_000_000 // 8  # ~n Mb worth of 8-byte doubles
 processes = multiprocessing.cpu_count()
 
 silence_threshold = 1 / 255

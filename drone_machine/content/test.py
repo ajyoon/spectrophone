@@ -9,7 +9,11 @@ from drone_machine.score import Score
 
 # Samplers ####################################################################
 
-length_weights = [(w[0] * config.sample_rate, w[1]) for w in [
+def weight_seconds_to_samples(weights):
+    return [(w[0] * config.sample_rate, w[1]) for w in weights]
+
+
+med_length_weights = weight_seconds_to_samples([
     # (seconds, weight)
     (0.01, 1),
     (0.05, 5),
@@ -17,19 +21,70 @@ length_weights = [(w[0] * config.sample_rate, w[1]) for w in [
     (0.5, 3),
     (1, 5),
     (10, 0)
-]]
+])
 
-cage_amp_factor_weights = [
+long_length_weights = weight_seconds_to_samples([
+    (0.01, 1),
+    (0.05, 5),
+    (0.1, 1),
+    (0.5, 3),
+    (1, 5),
+    (80, 0)
+])
+
+cage_feldman_amp_factor_weights = [
     (0.1, 20),
     (0.5, 4),
+    (1, 3),
+    (5, 0)
+]
+
+watts_amp_factor_weights = [
+    (0.01, 50),
+    (0.3, 3),
     (1, 1),
     (3, 0)
 ]
 
-watts_amp_factor_weights = [
+oliveros_amp_factor_weights = [
     (0.1, 50),
     (0.5, 3),
-    (1, 1),
+    (1, 4),
+    (5, 0)
+]
+
+organ_1_amp_factor_weights = [
+    (0.1, 50),
+    (0.5, 3),
+    (1, 4),
+    (7, 0)
+]
+
+organ_2_amp_factor_weights = [
+    (0.1, 50),
+    (0.5, 3),
+    (1, 4),
+    (7, 0)
+]
+
+keys_amp_factor_weights = [
+    (0.1, 50),
+    (0.5, 3),
+    (1, 4),
+    (3, 0)
+]
+
+singing_amp_factor_weights = [
+    (0.1, 50),
+    (0.5, 3),
+    (1, 4),
+    (3, 0)
+]
+
+cooking_amp_factor_weights = [
+    (0.1, 50),
+    (0.5, 3),
+    (1, 4),
     (3, 0)
 ]
 
@@ -38,15 +93,50 @@ samplers = [
         source='cage_feldman.wav',
         step=int(config.sample_rate // 10),
         event_prob_factor=1,
-        length_weights=length_weights,
-        amp_factor_weights=cage_amp_factor_weights
+        length_weights=med_length_weights,
+        amp_factor_weights=cage_feldman_amp_factor_weights
     ),
     Sampler(
         source='watts.wav',
         step=int(config.sample_rate // 10),
         event_prob_factor=1,
-        length_weights=length_weights,
+        length_weights=med_length_weights,
         amp_factor_weights=watts_amp_factor_weights
+    ),
+    Sampler(
+        source='oliveros.wav',
+        step=int(config.sample_rate // 10),
+        event_prob_factor=1,
+        length_weights=med_length_weights,
+        amp_factor_weights=oliveros_amp_factor_weights
+    ),
+    Sampler(
+        source='organ_1.wav',
+        step=int(config.sample_rate // 10),
+        event_prob_factor=1,
+        length_weights=long_length_weights,
+        amp_factor_weights=organ_1_amp_factor_weights
+    ),
+    Sampler(
+        source='organ_2.wav',
+        step=int(config.sample_rate // 10),
+        event_prob_factor=1,
+        length_weights=long_length_weights,
+        amp_factor_weights=organ_2_amp_factor_weights
+    ),
+    Sampler(
+        source='keys.wav',
+        step=int(config.sample_rate // 10),
+        event_prob_factor=1,
+        length_weights=med_length_weights,
+        amp_factor_weights=keys_amp_factor_weights
+    ),
+    Sampler(
+        source='cooking.wav',
+        step=int(config.sample_rate // 10),
+        event_prob_factor=1,
+        length_weights=med_length_weights,
+        amp_factor_weights=cooking_amp_factor_weights
     ),
 ]
 
@@ -62,12 +152,12 @@ pitches = {
 }
 
 pitch_weights = [
-    (pitches['gf'], 8),
+    (pitches['gf'], 9),
     (pitches['bf'], 5),
     (pitches['c'], 7),
-    (pitches['df'], 3),
-    (pitches['ef'], 1),
-    (pitches['f'], 3),
+    (pitches['df'], 8),
+    (pitches['ef'], 3),
+    (pitches['f'], 5),
 ]
 
 detune_weights = [
@@ -78,18 +168,8 @@ detune_weights = [
     (50, 0),
 ]
 
-# octave_weights = [
-#     (1/8, 5),
-#     (1/4, 15),
-#     (1/2, 35),
-#     (1, 20),
-#     (2, 3),
-#     (4, 0.5),
-#     (8, 0.1),
-# ]
-
 octave_weights = [
-    (1/8, 1),
+    (1/8, 4),
     (1/4, 25),
     (1/2, 20),
     (1, 20),
@@ -99,7 +179,7 @@ octave_weights = [
 ]
 
 oscillators = fuzzy_osc_gen.generate(
-    num=1200,
+    num=2000,
     pitch_weights=pitch_weights,
     detune_weights=detune_weights,
     octave_weights=octave_weights

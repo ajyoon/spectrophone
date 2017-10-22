@@ -1,4 +1,4 @@
-from drone_machine.keyframe import Keyframe
+from spectrophone.keyframe import Keyframe
 
 
 class Agent:

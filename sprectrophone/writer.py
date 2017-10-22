@@ -3,7 +3,7 @@ import wave
 import numpy as np
 from tqdm import tqdm
 
-from drone_machine import config
+from spectrophone import config
 
 
 def write(out_path, samples):

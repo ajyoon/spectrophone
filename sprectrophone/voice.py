@@ -1,6 +1,6 @@
 import numpy
 
-from drone_machine import config
+from spectrophone import config
 
 
 class Voice:

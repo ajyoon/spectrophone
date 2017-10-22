@@ -1,10 +1,10 @@
 import os
 
-from drone_machine import config
-from drone_machine.sampler import Sampler
-from drone_machine.frequencies import frequencies
-from drone_machine.content import fuzzy_osc_gen
-from drone_machine.score import Score
+from spectrophone import config
+from spectrophone.sampler import Sampler
+from spectrophone.frequencies import frequencies
+from spectrophone.content import fuzzy_osc_gen
+from spectrophone.score import Score
 
 
 # Samplers ####################################################################

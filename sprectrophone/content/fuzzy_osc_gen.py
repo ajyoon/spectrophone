@@ -1,7 +1,7 @@
 from tqdm import tqdm
 from blur import rand
 
-from drone_machine.oscillator import Oscillator
+from spectrophone.oscillator import Oscillator
 
 
 def generate(num, pitch_weights, detune_weights,

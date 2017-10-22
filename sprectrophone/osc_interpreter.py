@@ -8,8 +8,8 @@ from tqdm import tqdm
 from blur import rand
 import numpy as np
 
-from drone_machine import config
-from drone_machine.voice import Voice
+from spectrophone import config
+from spectrophone.voice import Voice
 
 
 def interpret(score, oscillators):

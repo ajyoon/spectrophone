@@ -8,8 +8,8 @@ import numpy
 
 from tqdm import tqdm
 
-from drone_machine import config
-from drone_machine import terminal
+from spectrophone import config
+from spectrophone import terminal
 
 
 def normalize(array, value):

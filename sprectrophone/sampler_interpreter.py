@@ -4,9 +4,9 @@ import numpy as np
 from tqdm import tqdm
 from blur import rand
 
-from drone_machine import config
-from drone_machine.sampler_voice import SamplerVoice
-from drone_machine.sampler_event import SamplerEvent
+from spectrophone import config
+from spectrophone.sampler_voice import SamplerVoice
+from spectrophone.sampler_event import SamplerEvent
 
 
 def interpret(score, samplers):

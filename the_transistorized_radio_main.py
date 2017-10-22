@@ -1,9 +1,9 @@
-from drone_machine import rendering
-from drone_machine import osc_interpreter
-from drone_machine import sampler_interpreter
-from drone_machine import terminal
-from drone_machine import writer
-from drone_machine.content import the_transistorized_radio as content
+from spectrophone import rendering
+from spectrophone import osc_interpreter
+from spectrophone import sampler_interpreter
+from spectrophone import terminal
+from spectrophone import writer
+from spectrophone.content import the_transistorized_radio as content
 
 
 out_path = 'out.wav'

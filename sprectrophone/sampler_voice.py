@@ -1,4 +1,4 @@
-from drone_machine.sampler import Sampler
+from spectrophone.sampler import Sampler
 
 
 class SamplerVoice:

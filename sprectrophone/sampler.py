@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-from drone_machine import config
+from spectrophone import config
 
 
 class Sampler:

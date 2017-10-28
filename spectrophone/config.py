@@ -29,7 +29,7 @@ processes = multiprocessing.cpu_count()
 
 silence_threshold = 1 / 255
 
-length = 60 * 80  # Seconds
+length = 60 * 59  # Seconds
 total_samples = int(length * sample_rate)
 
 osc_step = int(sample_rate / 50)

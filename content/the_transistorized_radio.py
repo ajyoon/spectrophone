@@ -7,10 +7,18 @@ from content import fuzzy_osc_gen
 from spectrophone.score import Score
 
 
+num_osc = 6000
+amp_multiplier = num_osc / 300
+
+
 # Samplers ####################################################################
 
 def weight_seconds_to_samples(weights):
     return [(w[0] * config.sample_rate, w[1]) for w in weights]
+
+
+def apply_amp_weight_multiplier(weights):
+    return [(w[0] * amp_multiplier, w[1]) for w in weights]
 
 
 med_length_weights = weight_seconds_to_samples([
@@ -32,61 +40,26 @@ long_length_weights = weight_seconds_to_samples([
     (80, 0)
 ])
 
-cage_feldman_amp_factor_weights = [
-    (0.1, 20),
+low_amp_factor_weights = apply_amp_weight_multiplier([
+    (0.005, 50),
+    (0.3, 2),
+    (1, 0.2),
+    (3, 0)
+])
+
+med_amp_factor_weights = apply_amp_weight_multiplier([
+    (0.1, 50),
+    (0.5, 3),
+    (1, 4),
+    (3, 0)
+])
+
+loud_amp_factor_weights = apply_amp_weight_multiplier([
+    (0.1, 13),
     (0.5, 4),
     (1, 3),
-    (5, 0)
-]
-
-watts_amp_factor_weights = [
-    (0.01, 50),
-    (0.3, 3),
-    (1, 1),
-    (3, 0)
-]
-
-oliveros_amp_factor_weights = [
-    (0.1, 50),
-    (0.5, 3),
-    (1, 4),
-    (5, 0)
-]
-
-organ_1_amp_factor_weights = [
-    (0.1, 50),
-    (0.5, 3),
-    (1, 4),
-    (7, 0)
-]
-
-organ_2_amp_factor_weights = [
-    (0.1, 50),
-    (0.5, 3),
-    (1, 4),
-    (7, 0)
-]
-
-keys_amp_factor_weights = [
-    (0.1, 50),
-    (0.5, 3),
-    (1, 4),
-    (3, 0)
-]
-
-singing_amp_factor_weights = [
-    (0.1, 50),
-    (0.5, 3),
-    (1, 4),
-    (3, 0)
-]
-
-cooking_amp_factor_weights = [
-    (0.1, 50),
-    (0.5, 3),
-    (1, 4),
-    (3, 0)
-]
+    (15, 0)
+])
 
 samplers = [
     Sampler(
@@ -94,49 +67,49 @@ samplers = [
         step=int(config.sample_rate // 10),
         event_prob_factor=1,
         length_weights=med_length_weights,
-        amp_factor_weights=cage_feldman_amp_factor_weights
+        amp_factor_weights=med_amp_factor_weights
     ),
     Sampler(
         source='watts.wav',
         step=int(config.sample_rate // 10),
-        event_prob_factor=1,
+        event_prob_factor=0.7,
         length_weights=med_length_weights,
-        amp_factor_weights=watts_amp_factor_weights
+        amp_factor_weights=low_amp_factor_weights
     ),
     Sampler(
         source='oliveros.wav',
         step=int(config.sample_rate // 10),
-        event_prob_factor=1,
+        event_prob_factor=1.3,
         length_weights=med_length_weights,
-        amp_factor_weights=oliveros_amp_factor_weights
+        amp_factor_weights=loud_amp_factor_weights
     ),
     Sampler(
         source='organ_1.wav',
         step=int(config.sample_rate // 10),
         event_prob_factor=1,
         length_weights=long_length_weights,
-        amp_factor_weights=organ_1_amp_factor_weights
-    ),
-    Sampler(
-        source='organ_2.wav',
-        step=int(config.sample_rate // 10),
-        event_prob_factor=1,
-        length_weights=long_length_weights,
-        amp_factor_weights=organ_2_amp_factor_weights
+        amp_factor_weights=med_amp_factor_weights
     ),
     Sampler(
         source='keys.wav',
         step=int(config.sample_rate // 10),
-        event_prob_factor=1,
+        event_prob_factor=1.1,
         length_weights=med_length_weights,
-        amp_factor_weights=keys_amp_factor_weights
+        amp_factor_weights=loud_amp_factor_weights
+    ),
+    Sampler(
+        source='singing.wav',
+        step=int(config.sample_rate // 10),
+        event_prob_factor=1.5,
+        length_weights=long_length_weights,
+        amp_factor_weights=loud_amp_factor_weights
     ),
     Sampler(
         source='cooking.wav',
         step=int(config.sample_rate // 10),
-        event_prob_factor=1,
-        length_weights=med_length_weights,
-        amp_factor_weights=cooking_amp_factor_weights
+        event_prob_factor=1.5,
+        length_weights=long_length_weights,
+        amp_factor_weights=loud_amp_factor_weights
     ),
 ]
 
@@ -176,10 +149,11 @@ octave_weights = [
     (2, 15),
     (4, 1),
     (8, 0.1),
+    (16, 0.001),
 ]
 
 oscillators = fuzzy_osc_gen.generate(
-    num=2000,
+    num=num_osc,
     pitch_weights=pitch_weights,
     detune_weights=detune_weights,
     octave_weights=octave_weights
@@ -188,6 +162,6 @@ oscillators = fuzzy_osc_gen.generate(
 
 # Score #######################################################################
 
-score_file_name = 'scorev2.png'
+score_file_name = 'the_transistorized_radio.png'
 score_path = os.path.join(config.resources_dir, score_file_name)
 score = Score(score_path)

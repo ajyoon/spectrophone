@@ -12,17 +12,17 @@ from PIL import Image, ImageDraw
 from tqdm import tqdm
 
 
-length = 60 * 80  # seconds
-frames_per_second = 5.469166666666666
+length = 60 * 59  # seconds
+frames_per_second = 19359 / length  # 1 pix column per frame
 video_width = 1920
 video_height = 1080
 strip_ratio = 0.381966
-path = 'resources/scorev2.png'
+path = 'resources/the_transistorized_radio.png'
 working_dir_location = '.tmp'
 working_file_fmt = 'working_%08d.png'
 out_path = 'out.mp4'
 
-DEBUG = True
+DEBUG = False
 
 total_frames = int(frames_per_second * length)
 strip_width = int(strip_ratio * video_width)

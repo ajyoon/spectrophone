@@ -2,3 +2,4 @@ numpy
 blur
 Pillow
 tqdm
+matplotlib

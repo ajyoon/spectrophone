@@ -22,7 +22,7 @@ wave_params = (
 
 dtype = numpy.int16
 
-chunk_size = 2048
+chunk_size = 1024
 
 worker_data_size = 800_000_000 // 8  # ~n Mb worth of 8-byte doubles
 processes = multiprocessing.cpu_count()

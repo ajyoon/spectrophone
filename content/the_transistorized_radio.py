@@ -164,4 +164,4 @@ oscillators = fuzzy_osc_gen.generate(
 
 score_file_name = 'the_transistorized_radio.png'
 score_path = os.path.join(config.resources_dir, score_file_name)
-score = Score(score_path)
+score = Score.from_image(score_path)

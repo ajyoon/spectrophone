@@ -1,4 +1,5 @@
 import numpy as np
+from warnings import warn
 
 from spectrophone import config
 
@@ -15,6 +16,12 @@ class Oscillator:
     )
 
     def __init__(self, frequency):
+
+        if frequency > config.max_freq:
+            warn(f'frequency {frequency} exceeds max of {config.max_freq} hz,'
+                 ' using {config.max_freq} instead.')
+            frequency = config.max_freq
+
         self.frequency = frequency
         self.last_sample_i = 0
         self.last_amplitude = 0

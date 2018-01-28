@@ -4,21 +4,11 @@ import os
 import numpy
 
 
-nchannels = 1
 sampwidth = 2
 sample_rate = 44100
 nframes = 0
 comptype = 'NONE'
 compname = 'NONE'
-
-wave_params = (
-    nchannels,
-    sampwidth,
-    sample_rate,
-    nframes,
-    comptype,
-    compname
-)
 
 dtype = numpy.int16
 
@@ -29,7 +19,9 @@ processes = multiprocessing.cpu_count()
 
 silence_threshold = 0
 
-osc_step = int(sample_rate / 1)
+default_osc_step = int(sample_rate / 1)
+
+max_freq = sample_rate - 1000
 
 resources_dir = os.path.abspath(
     os.path.join(os.path.dirname(__file__),

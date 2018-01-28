@@ -12,7 +12,19 @@ from spectrophone import config
 from spectrophone.voice import Voice
 
 
-def interpret(score, oscillators, length_sec):
+def interpret(score, oscillators, length_sec,
+              step=config.default_osc_step):
+    """Interpret a score into keyframes in a series of given oscillators
+
+    Args:
+        score (Score):
+        oscillators ([Oscillator]):
+        length_sec (float): The length, in seconds, of the desired output.
+        step: The frequency, in samples, of keyframe opportunities for the
+            generated voices.
+
+    Returns: [Voice]
+    """
     voices = [Voice(o) for o in oscillators]
 
     n_groups = config.processes
@@ -28,7 +40,7 @@ def interpret(score, oscillators, length_sec):
         process = multiprocessing.Process(
             target=interpret_worker,
             args=(amp_map_slice, voice_group,
-                  length_sec, progress, result_queue)
+                  length_sec, step, progress, result_queue)
         )
         process.start()
         remaining_work.append(
@@ -68,7 +80,7 @@ def prob_bool_cycle(prob, length):
 
 
 def interpret_worker(
-        amplitude_map, voices, length_sec, progress, result_queue):
+        amplitude_map, voices, length_sec, step, progress, result_queue):
 
     total_samples = int(length_sec * config.sample_rate)
 
@@ -78,8 +90,8 @@ def interpret_worker(
     # Cache event decisions - use period length that unevenly divides score
     # width so different voices are not aligned
     prob = max((height / len(voices)) / 10, 0.00001)
-    event_positions = range(0, total_samples, config.osc_step)
-    num_events = total_samples // config.osc_step
+    event_positions = range(0, total_samples, step)
+    num_events = total_samples // step
     event_prob = prob_bool_cycle(prob, int(num_events * (19 / 7)))
 
     y_voice_map = [abs(int((v / len(voices)) * height) - height + 1)

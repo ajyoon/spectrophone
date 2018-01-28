@@ -29,13 +29,19 @@ def split_voices(voices, n_groups):
 
 
 def samples_needed(osc_voices, sampler_voices):
-    max_osc_sample = max((v.max_sample_pos
-                          for v in osc_voices),
-                         default=0)
-    max_sampler_sample = max((v.max_sample_pos
-                              for v in sampler_voices),
+    if osc_voices:
+        max_osc_sample = max((v.max_sample_pos
+                              for v in osc_voices),
                              default=0)
-    return max(max_osc_sample, max_sampler_sample)
+    else:
+        max_osc_sample = 0
+    if sampler_voices:
+        max_sampler_sample = max((v.max_sample_pos
+                                  for v in sampler_voices),
+                                 default=0)
+    else:
+        max_sampler_sample = 0
+    return int(max(max_osc_sample, max_sampler_sample))
 
 
 class RenderWork:
@@ -47,7 +53,6 @@ class RenderWork:
 
 def render(osc_voices, sampler_voices):
     total_samples = samples_needed(osc_voices, sampler_voices)
-
 
     render_start_time = time.time()
 

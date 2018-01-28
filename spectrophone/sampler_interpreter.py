@@ -9,24 +9,25 @@ from spectrophone.sampler_voice import SamplerVoice
 from spectrophone.sampler_event import SamplerEvent
 
 
-def interpret(score, samplers):
+def interpret(score, samplers, length_sec):
     avg_map = np.average(score.amplitude_map, 0)
     voices = []
     for sampler in tqdm(samplers, 'interpreting samplers'):
-        voices.append(_interpret_sampler(sampler, avg_map))
+        voices.append(_interpret_sampler(sampler, avg_map, length_sec))
     return voices
 
 
-def _interpret_sampler(sampler, avg_map):
+def _interpret_sampler(sampler, avg_map, length_sec):
+    total_samples = int(length_sec * config.sample_rate)
     sampler_voice = SamplerVoice(sampler)
-    for event_pos in tqdm(range(0, config.total_samples,
+    for event_pos in tqdm(range(0, total_samples,
                                 sampler.step),
                           f'interpreting {sampler.source}'):
-        x = int(event_pos / config.total_samples * len(avg_map))
+        x = int(event_pos / total_samples * len(avg_map))
         avg = avg_map[x] * sampler.event_prob_factor
         if rand.prob_bool(avg):
             length = min(int(rand.weighted_rand(sampler.length_weights)),
-                         config.total_samples - event_pos)
+                         total_samples - event_pos)
             sample_pos = random.randint(0, len(sampler.samples) - length - 1)
             amp = avg * rand.weighted_rand(sampler.amp_factor_weights)
             sampler_voice.events.append(

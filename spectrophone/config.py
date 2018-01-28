@@ -29,9 +29,6 @@ processes = multiprocessing.cpu_count()
 
 silence_threshold = 0
 
-length = 60 * 10  # Seconds
-total_samples = int(length * sample_rate)
-
 osc_step = int(sample_rate / 1)
 
 resources_dir = os.path.abspath(

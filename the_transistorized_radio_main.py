@@ -6,10 +6,13 @@ from spectrophone import writer
 from content import the_transistorized_radio as content
 
 
+length_sec = 60 * 60
 out_path = 'out.wav'
 
-sampler_voices = sampler_interpreter.interpret(content.score, content.samplers)
-osc_voices = osc_interpreter.interpret(content.score, content.oscillators)
+sampler_voices = sampler_interpreter.interpret(
+    content.score, content.samplers, length_sec)
+osc_voices = osc_interpreter.interpret(
+    content.score, content.oscillators, length_sec)
 samples = rendering.render(osc_voices, sampler_voices)
 
 writer.write('out.wav', samples)

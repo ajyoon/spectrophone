@@ -17,6 +17,10 @@ class Voice:
         # A list of (sample_pos, amplitude) keyframe tuples
         self.keyframes = []
 
+    @property
+    def max_sample_pos(self):
+        return max((f[0] for f in self.keyframes), default=0)
+
     def finalize(self, keyframes_need_sort=True):
         """Finalize the voice's keyframes.
 

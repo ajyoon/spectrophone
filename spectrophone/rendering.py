@@ -28,6 +28,16 @@ def split_voices(voices, n_groups):
             if len(group)]
 
 
+def samples_needed(osc_voices, sampler_voices):
+    max_osc_sample = max((v.max_sample_pos
+                          for v in osc_voices),
+                         default=0)
+    max_sampler_sample = max((v.max_sample_pos
+                              for v in sampler_voices),
+                             default=0)
+    return max(max_osc_sample, max_sampler_sample)
+
+
 class RenderWork:
     def __init__(self, process, progress, progress_bar):
         self.process = process
@@ -36,9 +46,12 @@ class RenderWork:
 
 
 def render(osc_voices, sampler_voices):
+    total_samples = samples_needed(osc_voices, sampler_voices)
+
+
     render_start_time = time.time()
 
-    data_array = multiprocessing.Array(ctypes.c_double, config.total_samples)
+    data_array = multiprocessing.Array(ctypes.c_double, total_samples)
 
     if sampler_voices:
         render_samplers(sampler_voices, data_array)
@@ -51,9 +64,9 @@ def render(osc_voices, sampler_voices):
         progress = multiprocessing.Value(ctypes.c_ulonglong, 0)
         process = multiprocessing.Process(
             target=render_osc_worker,
-            args=(group, data_array, 0, config.total_samples, progress))
+            args=(group, data_array, 0, total_samples, progress))
         process.start()
-        progress_bar = tqdm(total=config.total_samples,
+        progress_bar = tqdm(total=total_samples,
                             desc='rendering pid ' + str(process.pid))
         remaining_work.append(RenderWork(process, progress, progress_bar))
 
@@ -109,6 +122,7 @@ def render_osc_worker(osc_voices, data_array, start, end, progress):
             if voice_samples is not None:
                 chunk += voice_samples
         chunks.append(chunk)
+
         # No lock needed since we're the only process writing to this
         progress.value = pos
 

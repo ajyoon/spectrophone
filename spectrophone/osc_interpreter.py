@@ -12,7 +12,7 @@ from spectrophone import config
 from spectrophone.voice import Voice
 
 
-def interpret(score, oscillators):
+def interpret(score, oscillators, length_sec):
     voices = [Voice(o) for o in oscillators]
 
     n_groups = config.processes
@@ -27,7 +27,8 @@ def interpret(score, oscillators):
         result_queue = multiprocessing.Queue(maxsize=1)
         process = multiprocessing.Process(
             target=interpret_worker,
-            args=(amp_map_slice, voice_group, progress, result_queue)
+            args=(amp_map_slice, voice_group,
+                  length_sec, progress, result_queue)
         )
         process.start()
         remaining_work.append(
@@ -66,15 +67,19 @@ def prob_bool_cycle(prob, length):
     return itertools.cycle([rand.prob_bool(prob) for i in range(length)])
 
 
-def interpret_worker(amplitude_map, voices, progress, result_queue):
+def interpret_worker(
+        amplitude_map, voices, length_sec, progress, result_queue):
+
+    total_samples = int(length_sec * config.sample_rate)
+
     width = len(amplitude_map[0])
     height = len(amplitude_map)
 
     # Cache event decisions - use period length that unevenly divides score
     # width so different voices are not aligned
     prob = max((height / len(voices)) / 10, 0.00001)
-    event_positions = range(0, config.total_samples, config.osc_step)
-    num_events = config.total_samples // config.osc_step
+    event_positions = range(0, total_samples, config.osc_step)
+    num_events = total_samples // config.osc_step
     event_prob = prob_bool_cycle(prob, int(num_events * (19 / 7)))
 
     y_voice_map = [abs(int((v / len(voices)) * height) - height + 1)
@@ -84,7 +89,7 @@ def interpret_worker(amplitude_map, voices, progress, result_queue):
         voice = voices[v]
         for event_pos in event_positions:
             if next(event_prob):
-                x = int((event_pos / config.total_samples) * width)
+                x = int((event_pos / total_samples) * width)
                 voice.keyframes.append((event_pos,
                                         amplitude_map[y_voice_map[v]][x]))
         voice.finalize(False)

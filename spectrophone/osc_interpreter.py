@@ -94,16 +94,26 @@ def interpret_worker(
     num_events = total_samples // step
     event_prob = prob_bool_cycle(prob, int(num_events * (19 / 7)))
 
-    y_voice_map = [abs(int((v / len(voices)) * height) - height + 1)
+    # Build a mapping list where each index contains the y coordinate in the
+    # amplitude map where a voice lands.
+    y_voice_map = [abs(int((v / (len(voices) + 1)) * height) - height)
                    for v in range(len(voices))]
 
     for v in range(len(voices)):
         voice = voices[v]
+        if v == len(voices) - 1:
+            # FIXME: amplitude_map is inverted on the y axis and voices is
+            #        backwards, so weird indexing things are needed here.
+            #        this should be cleaned up so things are more intuitive
+            voice_amp_map = amplitude_map[:y_voice_map[v]].transpose()
+        else:
+            voice_amp_map = amplitude_map[
+                y_voice_map[v + 1]:y_voice_map[v]].transpose()
         for event_pos in event_positions:
             if next(event_prob):
                 x = int((event_pos / total_samples) * width)
-                voice.keyframes.append((event_pos,
-                                        amplitude_map[y_voice_map[v]][x]))
+                amplitude = voice_amp_map[x].mean()
+                voice.keyframes.append((event_pos, amplitude))
         voice.finalize(False)
         progress.value = v
 

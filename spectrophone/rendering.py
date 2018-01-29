@@ -51,7 +51,7 @@ class RenderWork:
         self.progress_bar = progress_bar
 
 
-def render(osc_voices, sampler_voices):
+def render(osc_voices, sampler_voices=None):
     total_samples = samples_needed(osc_voices, sampler_voices)
 
     render_start_time = time.time()

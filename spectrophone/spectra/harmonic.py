@@ -16,9 +16,9 @@ def fractal(fundamentals, depth, num_partials):
             for f in fundamentals
         ]))
 
-    return list(itertools.chain.from_iterable([
+    return sorted(list(itertools.chain.from_iterable([
         fractal(list(itertools.chain.from_iterable([series(f, num_partials)])),
                 depth - 1,
                 num_partials)
         for f in fundamentals
-    ]))
+    ])))

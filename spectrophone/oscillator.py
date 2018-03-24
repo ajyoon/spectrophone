@@ -2,6 +2,7 @@ import numpy as np
 from warnings import warn
 
 from spectrophone import config
+from spectrophone.waveform import Sine
 
 
 class Oscillator:
@@ -10,12 +11,13 @@ class Oscillator:
 
     __slots__ = (
         'frequency',
+        'waveform',
         'last_sample_i',
         'period',
-        'last_amplitude'
+        'last_amplitude',
     )
 
-    def __init__(self, frequency):
+    def __init__(self, frequency, waveform=Sine):
 
         if frequency > config.max_freq:
             warn(f'frequency {frequency} exceeds max of {config.max_freq} hz,'
@@ -23,19 +25,17 @@ class Oscillator:
             frequency = config.max_freq
 
         self.frequency = frequency
+        self.waveform = waveform
         self.last_sample_i = 0
         self.last_amplitude = 0
 
         period_len = round(config.sample_rate / self.frequency)
 
-        if (self.frequency, config.sample_rate) in Oscillator.periods:
-            self.period = Oscillator.periods[self.frequency]
+        if (self.frequency, self.waveform) in Oscillator.periods:
+            self.period = Oscillator.periods[(self.frequency, self.waveform)]
         else:
-            self.period = (
-                np.sin(np.arange(period_len)
-                       * (self.frequency
-                          * ((np.pi * 2) / config.sample_rate)))) * 32767
-            Oscillator.periods[self.frequency] = self.period
+            self.period = self.waveform.generate_period(self.frequency)
+            Oscillator.periods[(self.frequency, self.waveform)] = self.period
 
     def get_samples(self, num, amplitude):
         """Assumes `num > 2 * len(self.period)`"""

@@ -8,7 +8,7 @@ _MAX_24_BIT_DISTANCE = math.sqrt((255**2) * 3)
 
 
 
-def get_color_similarity_map(image, color, threshold=0):
+def color_similarity_map(image, color, threshold=0):
     """Extract a color similarity channel from an RGB image.
 
     Computes the euclidian distance of each pixel's RGB color to a given
@@ -26,6 +26,8 @@ def get_color_similarity_map(image, color, threshold=0):
     """
 
     if isinstance(color, str):
+        if not color.startswith('#'):
+            color = '#' + color
         color = ImageColor.getcolor(color, 'RGB')
 
     array = np.array(image)
@@ -37,6 +39,24 @@ def get_color_similarity_map(image, color, threshold=0):
         return offset * (scaled.max() / offset.max()).astype('f2')
     else:
         return scaled.astype('f2')
+
+
+def multi_color_similarity_map(image, channel_params):
+    """Extract a similarity map using multiple colors and thresholds
+
+    Args:
+        image (Image):
+        channel_params (list[tuple]): A list of 3-tuples where the first
+            value is a color, the second is a threshold, and the third is
+            a 0-1 weight multiplier. See `color_similarity_map` for more
+            on the color and threshold values.
+
+    Returns: numpy.ndarray
+    """
+    return np.maximum.reduce([
+        color_similarity_map(image, *params[:2]) * params[2]
+        for params in channel_params
+    ])
 
 
 def split_into_color_maps(image, colors, threshold):

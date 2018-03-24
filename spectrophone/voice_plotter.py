@@ -9,11 +9,11 @@ def plot_voices(voices):
 
     plt.figure(1)
 
-    for voice in voices:
+    for i, voice in enumerate(voices):
         frames = voice.keyframes
         plt.plot(
             [f[0] for f in frames],
-            [f[1] for f in frames]
+            [f[1] + voice.oscillator.frequency for f in frames]
         )
 
     plt.show()

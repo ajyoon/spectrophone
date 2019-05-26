@@ -1,3 +1,7 @@
+# THIS REPOSITORY IS DEPRECATED
+
+This instrument has been rewritten and significantly improved (including real-time performance, live video input, and much much more) and lives now at [https://gitlab.com/ajyoon/spectrophone](https://gitlab.com/ajyoon/spectrophone). I'm leaving this repo around just to not break links (and to allow reproduction of [the transistorized radio](https://youtu.be/eO98X3JIC48)).
+
 # spectrophone
 
 an electronic instrument which interprets images as sound with oscillators and samplers
